@@ -110,7 +110,7 @@ Pipeline eksekusi: Monitor, Predict, Social berjalan **paralel** → Ethics → 
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/alfahenokh/ecoguardian.git
+git clone https://github.com/caseyshalom/ecoguardian.git
 cd ecoguardian
 
 # 2. Buat virtual environment
@@ -263,7 +263,7 @@ Guardian AI Chat (tanya jawab lanjutan via Groq)
 
 EcoGuardian AI — Dikembangkan untuk kompetisi AI Agentik
 
-GitHub: https://github.com/alfahenokh/ecoguardian
+GitHub: https://github.com/caseyshalom/ecoguardian
 
 ---
 
