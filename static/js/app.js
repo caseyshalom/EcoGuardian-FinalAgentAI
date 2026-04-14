@@ -617,9 +617,7 @@ function showMapForLocation(lat, lon, cityName, riskLevel, metrics) {
             : ""
         }
       </table>
-    </div>`
-    )
-    .openPopup();
+    </div>`);
   // Fix map render in initially hidden container
   setTimeout(() => ecoMap.invalidateSize(), 150);
   // Update subtitle
@@ -1657,8 +1655,7 @@ function initWeatherMap(lat, lon, city, w, aq) {
       🌡️ ${tmpStr}°C | 💨 AQI: ${(aq||{}).aqi || "N/A"}<br>
       🌧️ Hujan: ${rain}mm/h<br>
       ${desc}
-    </div>`)
-    .openPopup();
+    </div>`);
 
   setTimeout(() => window._weatherMap.invalidateSize(), 150);
   updateWeatherLegend(_currentLayerName, { rain, temp, aqiNum, wind: parseFloat((w||{}).wind_speed)||0 });

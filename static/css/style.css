@@ -1454,6 +1454,13 @@ body {
   border-radius: 10px;
   overflow: hidden;
 }
+/* Isolate map stacking context so popup stays inside card area */
+#weatherMapWrap,
+#indonesiaMapWrap {
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+}
 /* Card containing map must not clip popup */
 .card:has(#weatherMap),
 .card:has(#indonesiaMap),
