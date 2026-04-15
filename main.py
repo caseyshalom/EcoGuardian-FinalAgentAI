@@ -16,6 +16,10 @@ from pydantic import BaseModel
 
 load_dotenv()
 
+import logging
+logging.getLogger("supabase_db").setLevel(logging.WARNING)
+logging.getLogger("httpx").setLevel(logging.WARNING)
+
 from memory.db import init_db
 from agents.orchestrator import run_ecoguardian_agents
 
