@@ -246,6 +246,20 @@ def parse_action_plan(text: str) -> list:
 # CrewAI Crew Builder
 # ---------------------------------------------------------------------------
 
+def _detect_focus(query: str) -> str:
+    """Deteksi fokus utama dari query user."""
+    q = query.lower()
+    if any(w in q for w in ["cuaca", "hujan", "suhu", "angin", "prakiraan", "prediksi", "iklim", "banjir", "kekeringan"]):
+        return "cuaca"
+    if any(w in q for w in ["udara", "aqi", "pm2.5", "polusi", "polutan", "asap"]):
+        return "kualitas_udara"
+    if any(w in q for w in ["sosial", "masyarakat", "rentan", "miskin", "kemiskinan", "sanitasi"]):
+        return "sosial"
+    if any(w in q for w in ["aksi", "rekomendasi", "solusi", "langkah", "tindakan"]):
+        return "aksi"
+    return "lengkap"
+
+
 def build_crew(env_data: dict, user_query: str, city: str):
     fast_llm = LLM(
         model="groq/llama-3.1-8b-instant",
@@ -273,6 +287,7 @@ def build_crew(env_data: dict, user_query: str, city: str):
 
     forecast_days = env_data.get("forecast", {}).get("forecast", [])[:7]
     eq = env_data.get("earthquake", {})
+    focus = _detect_focus(user_query)
 
     # ── Context injection kaya ─────────────────────────────────────────────
     aqi_val   = aq.get("aqi", "N/A")
@@ -527,10 +542,45 @@ def build_crew(env_data: dict, user_query: str, city: str):
         callback=lambda _: time.sleep(5),
     )
 
+    # Instruksi fokus berdasarkan query user
+    FOCUS_INSTRUCTIONS = {
+        "cuaca": (
+            "FOKUS UTAMA: CUACA & PREDIKSI IKLIM\n"
+            "- Section KONDISI SAAT INI: fokus pada suhu, kelembaban, angin, kondisi cuaca (80% konten)\n"
+            "- Section PREDIKSI RISIKO: uraikan prakiraan 7 hari secara detail per hari/periode (80% konten)\n"
+            "- Section DAMPAK SOSIAL: ringkas saja dalam 1-2 kalimat, tidak perlu detail\n"
+            "- Section RENCANA AKSI: fokus pada aksi terkait cuaca dan mitigasi bencana iklim"
+        ),
+        "kualitas_udara": (
+            "FOKUS UTAMA: KUALITAS UDARA & POLUSI\n"
+            "- Section KONDISI SAAT INI: fokus pada AQI, PM2.5, polutan dominan (80% konten)\n"
+            "- Section PREDIKSI RISIKO: fokus pada prediksi kualitas udara ke depan\n"
+            "- Section DAMPAK SOSIAL: ringkas saja dalam 1-2 kalimat\n"
+            "- Section RENCANA AKSI: fokus pada aksi pengurangan polusi"
+        ),
+        "sosial": (
+            "FOKUS UTAMA: DAMPAK SOSIAL & KERENTANAN\n"
+            "- Section KONDISI SAAT INI: ringkas kondisi lingkungan dalam 2-3 kalimat\n"
+            "- Section DAMPAK SOSIAL: uraikan secara detail kelompok rentan dan ketimpangan (80% konten)\n"
+            "- Section RENCANA AKSI: fokus pada aksi sosial dan kebijakan inklusif"
+        ),
+        "aksi": (
+            "FOKUS UTAMA: RENCANA AKSI KONKRET\n"
+            "- Section KONDISI SAAT INI: ringkas dalam 2-3 kalimat\n"
+            "- Section RENCANA AKSI: buat 3 aksi yang sangat spesifik, terukur, dan realistis (80% konten)\n"
+            "- Setiap aksi harus punya timeline, pelaku, dan indikator keberhasilan"
+        ),
+        "lengkap": (
+            "FOKUS: ANALISIS LENGKAP — berikan porsi seimbang untuk semua section"
+        ),
+    }
+    focus_instruction = FOCUS_INSTRUCTIONS.get(focus, FOCUS_INSTRUCTIONS["lengkap"])
+
     task_report = Task(
         description=(
             f"Buat laporan EcoGuardian untuk {city}.\n\n"
             f"JAWAB LANGSUNG pertanyaan ini di paragraf pertama: \"{user_query[:150]}\"\n\n"
+            f"{focus_instruction}\n\n"
             f"{DATA_CONTEXT}\n\n"
             "FORMAT WAJIB — tulis persis dengan heading ini:\n\n"
             "1. KONDISI SAAT INI\n"
@@ -550,8 +600,8 @@ def build_crew(env_data: dict, user_query: str, city: str):
             "Baris terakhir (wajib, harus persis seperti ini tanpa teks lain): RISK_LEVEL: rendah/sedang/tinggi/kritis"
         ),
         expected_output=(
-            "Laporan 5 bagian dengan Chain-of-Thought reasoning, angka spesifik, "
-            "3 rencana aksi terstruktur, diakhiri RISK_LEVEL."
+            "Laporan 5 bagian dengan fokus sesuai pertanyaan user, Chain-of-Thought reasoning, "
+            "angka spesifik, 3 rencana aksi terstruktur, diakhiri RISK_LEVEL."
         ),
         agent=report_agent,
         context=[task_monitor, task_predict, task_social, task_ethics],
