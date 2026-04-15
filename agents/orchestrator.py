@@ -226,20 +226,19 @@ def build_crew(env_data: dict, user_query: str, city: str):
     fast_llm = LLM(
         model="groq/llama-3.1-8b-instant",
         api_key=os.getenv("GROQ_API_KEY", ""),
-        temperature=0.2,
+        temperature=0.1,  # lebih deterministik & faktual
     )
     report_llm = LLM(
         model="groq/llama-3.1-8b-instant",
         api_key=os.getenv("GROQ_API_KEY", ""),
-        temperature=0.3,
+        temperature=0.15,  # laporan lebih konsisten
     )
 
-    aq            = env_data.get("air_quality", {})
-    weather       = env_data.get("weather", {})
-    social        = env_data.get("social", {}).get("data", {})
+    aq      = env_data.get("air_quality", {})
+    weather = env_data.get("weather", {})
+    social  = env_data.get("social", {}).get("data", {})
 
     def fmt(key: str) -> str:
-        """Bulatkan nilai sosial jadi angka bulat tanpa desimal."""
         val = social.get(key, {}).get("value")
         if val is None:
             return "N/A"
@@ -247,112 +246,285 @@ def build_crew(env_data: dict, user_query: str, city: str):
             return str(round(float(val)))
         except Exception:
             return str(val)
-    forecast_days = env_data.get("forecast", {}).get("forecast", [])[:2]
-    eq            = env_data.get("earthquake", {})
 
-    # ── Agents ────────────────────────────────────────────────────────────
+    forecast_days = env_data.get("forecast", {}).get("forecast", [])[:3]
+    eq = env_data.get("earthquake", {})
+
+    # ── Context injection kaya ─────────────────────────────────────────────
+    aqi_val   = aq.get("aqi", "N/A")
+    pm25_val  = aq.get("pm25", "N/A")
+    temp_val  = weather.get("temperature", "N/A")
+    hum_val   = weather.get("humidity", "N/A")
+    wind_val  = weather.get("wind_speed", "N/A")
+    desc_val  = weather.get("description", "N/A")
+    pollutant = aq.get("dominant_pollutant", "N/A")
+
+    try:
+        aqi_num = float(aqi_val)
+        if aqi_num <= 50:
+            aqi_status = f"BAIK ({aqi_num:.0f} — dalam batas aman WHO <50)"
+        elif aqi_num <= 100:
+            aqi_status = f"SEDANG ({aqi_num:.0f} — {aqi_num-50:.0f} poin di atas zona baik)"
+        elif aqi_num <= 150:
+            aqi_status = f"TIDAK SEHAT ({aqi_num:.0f} — {aqi_num-100:.0f} poin di atas batas ISPU 100)"
+        elif aqi_num <= 200:
+            aqi_status = f"SANGAT TIDAK SEHAT ({aqi_num:.0f} — darurat kelompok sensitif)"
+        else:
+            aqi_status = f"BERBAHAYA ({aqi_num:.0f} — darurat kesehatan publik)"
+    except (ValueError, TypeError):
+        aqi_status = "DATA TIDAK TERSEDIA dari WAQI"
+
+    try:
+        pm25_num = float(pm25_val)
+        pm25_status = (
+            f"{pm25_num}μg/m³ — AMAN" if pm25_num <= 25
+            else f"{pm25_num}μg/m³ — MELEBIHI batas WHO 25μg/m³ sebesar {pm25_num-25:.1f}μg/m³ ({((pm25_num/25)-1)*100:.0f}% di atas batas)"
+        )
+    except (ValueError, TypeError):
+        pm25_status = "DATA TIDAK TERSEDIA"
+
+    fc_summary = ""
+    if forecast_days:
+        rains = [float(d.get("precipitation") or 0) for d in forecast_days]
+        max_rain = max(rains)
+        fc_summary = (
+            f"Prakiraan 3 hari: curah hujan maks {max_rain:.1f}mm/hari "
+            f"({'RISIKO BANJIR TINGGI' if max_rain >= 50 else 'WASPADA' if max_rain >= 20 else 'NORMAL'}), "
+            f"suhu {forecast_days[0].get('temp_min','?')}-{forecast_days[0].get('temp_max','?')}°C"
+        )
+
+    STANDARDS = (
+        "STANDAR: WHO AQI aman <50 | ISPU: Baik 0-50, Sedang 51-100, "
+        "Tidak Sehat 101-199, Sangat Tidak Sehat 200-299, Berbahaya >300 | "
+        "PM2.5 harian WHO <25μg/m³ | Banjir >50mm/hari | Suhu nyaman 20-28°C"
+    )
+
+    DATA_CONTEXT = (
+        f"DATA REAL-TIME {city.upper()}:\n"
+        f"- Kualitas Udara: {aqi_status}\n"
+        f"- PM2.5: {pm25_status}\n"
+        f"- Polutan dominan: {pollutant}\n"
+        f"- Suhu: {temp_val}°C | Kelembaban: {hum_val}% | Angin: {wind_val} m/s\n"
+        f"- Kondisi cuaca: {desc_val}\n"
+        f"- {fc_summary}\n"
+        f"- Gempa terbaru BMKG: M{eq.get('magnitude','N/A')} {eq.get('tanggal','N/A')} — {eq.get('wilayah','N/A')}\n"
+        f"{STANDARDS}"
+    )
+
+    SOCIAL_CONTEXT = (
+        f"DATA SOSIAL {city.upper()} (World Bank):\n"
+        f"- Kemiskinan: {fmt('poverty_rate')}% | Air bersih: {fmt('clean_water_access')}%\n"
+        f"- Sanitasi: {fmt('basic_sanitation')}% | Listrik: {fmt('electricity_access')}%"
+    )
+
+    # ── Agents dengan persona kuat ─────────────────────────────────────────
 
     monitor_agent = Agent(
-        role="Agen Pemantau Lingkungan",
-        goal="Analisis kualitas udara dan cuaca berbasis standar WHO/ISPU, jawab relevan dengan pertanyaan user.",
-        backstory="Ilmuwan lingkungan transparan yang selalu menyebut standar ilmiah.",
+        role="Dr. Rina — Ilmuwan Lingkungan Senior KLHK",
+        goal=(
+            "Analisis kualitas udara dan cuaca secara mendalam berbasis data nyata. "
+            "Selalu bandingkan dengan standar WHO/ISPU. Jelaskan MENGAPA kondisi terjadi."
+        ),
+        backstory=(
+            "Kamu adalah Dr. Rina, ilmuwan lingkungan senior KLHK dengan 20 tahun pengalaman. "
+            "Kamu SELALU: (1) menyebut angka spesifik dari data, "
+            "(2) membandingkan dengan standar WHO/ISPU secara eksplisit, "
+            "(3) menjelaskan kausalitas — mengapa kondisi ini terjadi, "
+            "(4) tidak pernah membuat klaim tanpa data. "
+            "Jika data tidak tersedia, kamu tegas menyatakannya."
+        ),
         llm=fast_llm, verbose=False, allow_delegation=False,
     )
     predict_agent = Agent(
-        role="Agen Prediksi Risiko Iklim",
-        goal="Prediksi risiko banjir dan polusi dari prakiraan cuaca dengan tingkat kepercayaan.",
-        backstory="Ahli klimatologi yang tidak melebih-lebihkan risiko tanpa data.",
+        role="Prof. Budi — Ahli Klimatologi & Manajemen Risiko Bencana BMKG",
+        goal=(
+            "Prediksi risiko iklim dan bencana dengan probabilitas yang jelas. "
+            "Gunakan data prakiraan untuk proyeksi 3-7 hari ke depan."
+        ),
+        backstory=(
+            "Kamu adalah Prof. Budi, ahli klimatologi BMKG spesialis prediksi banjir dan polusi. "
+            "Kamu SELALU: (1) menyebut persentase probabilitas risiko, "
+            "(2) menjelaskan mekanisme kausal (curah hujan X mm → potensi banjir di Y), "
+            "(3) tidak melebih-lebihkan risiko tanpa data, "
+            "(4) memberi rentang waktu spesifik untuk setiap prediksi."
+        ),
         llm=fast_llm, verbose=False, allow_delegation=False,
     )
     social_agent = Agent(
-        role="Agen Dampak Sosial & Keadilan",
-        goal="Nilai dampak pada kelompok rentan, fokus keadilan sosial dan inklusi.",
-        backstory="Sosiolog yang mengadvokasi solusi inklusif untuk semua lapisan masyarakat.",
+        role="Dr. Siti — Sosiolog & Pakar Keadilan Lingkungan",
+        goal=(
+            "Analisis dampak lingkungan pada kelompok rentan dengan perspektif keadilan sosial. "
+            "Hitung skor kerentanan sosial 0-100 berbasis data World Bank."
+        ),
+        backstory=(
+            "Kamu adalah Dr. Siti, sosiolog senior pakar keadilan lingkungan. "
+            "Kamu SELALU: (1) mengidentifikasi kelompok paling terdampak dengan estimasi jumlah, "
+            "(2) menghubungkan data sosial-ekonomi dengan risiko lingkungan secara kausal, "
+            "(3) memberikan skor kerentanan 0-100 dengan penjelasan komponen, "
+            "(4) merekomendasikan solusi inklusif yang mempertimbangkan keterbatasan ekonomi."
+        ),
         llm=fast_llm, verbose=False, allow_delegation=False,
     )
     ethics_agent = Agent(
-        role="Agen Audit Etika AI",
-        goal="Validasi output: periksa bias, transparansi, keadilan, akurasi data.",
-        backstory="Auditor etika AI yang menerapkan prinsip fairness, accountability, transparency.",
+        role="Ir. Hasan — Auditor Etika AI & Transparansi Data",
+        goal=(
+            "Validasi seluruh output agen: periksa bias, klaim tanpa data, transparansi, keadilan. "
+            "Berikan skor etika 0-100 dengan temuan spesifik."
+        ),
+        backstory=(
+            "Kamu adalah Ir. Hasan, auditor etika AI yang menerapkan prinsip FAT "
+            "(Fairness, Accountability, Transparency). "
+            "Kamu SELALU: (1) memverifikasi setiap klaim dengan data sumbernya, "
+            "(2) menandai klaim tidak berdasar dengan ⚠️, "
+            "(3) memastikan rekomendasi realistis dan tidak diskriminatif, "
+            "(4) memberikan skor etika dengan breakdown per dimensi."
+        ),
         llm=fast_llm, verbose=False, allow_delegation=False,
     )
     report_agent = Agent(
-        role="Agen Pelaporan & Rencana Aksi",
-        goal="Buat laporan yang menjawab pertanyaan user secara spesifik dengan rencana aksi terukur.",
-        backstory="Analis kebijakan yang mengubah data menjadi aksi konkret dan terukur.",
+        role="Dr. Arif — Analis Kebijakan Lingkungan & Komunikator Sains",
+        goal=(
+            "Susun laporan komprehensif yang menjawab pertanyaan user secara langsung "
+            "dengan reasoning eksplisit dan rencana aksi terukur berbasis data."
+        ),
+        backstory=(
+            "Kamu adalah Dr. Arif, analis kebijakan lingkungan yang ahli mengubah data kompleks "
+            "menjadi rekomendasi aksi konkret dan terukur. "
+            "Kamu SELALU: (1) menjawab pertanyaan user langsung di paragraf pertama, "
+            "(2) menjelaskan reasoning step-by-step (observasi → interpretasi → kausalitas → rekomendasi), "
+            "(3) menggunakan angka spesifik untuk setiap klaim, "
+            "(4) membuat rencana aksi realistis dengan pelaku, timeline, dan dampak terukur."
+        ),
         llm=report_llm, verbose=False, allow_delegation=False,
     )
 
-    # ── Tasks ─────────────────────────────────────────────────────────────
+    # ── Tasks dengan Chain-of-Thought & Few-Shot ──────────────────────────
 
     task_monitor = Task(
         description=(
-            f"Analisis lingkungan {city} untuk menjawab: '{user_query[:100]}'\n"
-            f"Data tersedia: AQI={aq.get('aqi','TIDAK ADA')} PM2.5={aq.get('pm25','TIDAK ADA')} "
-            f"Suhu={weather.get('temperature','N/A')}°C Kelembaban={weather.get('humidity','N/A')}%.\n"
-            f"Gempa terbaru BMKG: M{eq.get('magnitude','N/A')} {eq.get('tanggal','N/A')} - {eq.get('wilayah','N/A')}.\n"
-            "PENTING: Jika AQI/PM2.5 'TIDAK ADA', nyatakan data tidak tersedia — jangan mengarang.\n"
-            "Jawab singkat: status udara, kondisi relevan dengan pertanyaan, 2 rekomendasi."
+            f"Pertanyaan user: '{user_query[:120]}'\n\n"
+            f"{DATA_CONTEXT}\n\n"
+            "Ikuti langkah Chain-of-Thought:\n"
+            "1. OBSERVASI: Apa yang data tunjukkan secara faktual? (sebutkan angka)\n"
+            "2. INTERPRETASI: Apa artinya bagi kesehatan manusia berdasarkan standar WHO/ISPU?\n"
+            "3. KAUSALITAS: Mengapa kondisi ini terjadi? (faktor cuaca, musim, aktivitas manusia)\n"
+            "4. RELEVANSI: Bagaimana ini menjawab pertanyaan user?\n"
+            "5. REKOMENDASI: 2 aksi spesifik berbasis data\n\n"
+            "Contoh format yang baik:\n"
+            "'AQI 156 (Tidak Sehat) — 56 poin di atas batas ISPU 100. "
+            "PM2.5 67μg/m³ = 2.7x batas harian WHO. "
+            "Penyebab: suhu tinggi 32°C + kelembaban rendah mempercepat pembentukan ozon troposfer. "
+            "Dampak: iritasi saluran napas pada populasi sensitif dalam 2-3 jam paparan luar ruangan.'\n\n"
+            "PENTING: Jika data 'TIDAK TERSEDIA', nyatakan eksplisit — jangan mengarang nilai."
         ),
-        expected_output="Status udara berbasis data nyata, kondisi relevan, 2 rekomendasi spesifik.",
+        expected_output=(
+            "Analisis 5 langkah CoT: observasi faktual → interpretasi standar → "
+            "kausalitas → relevansi → 2 rekomendasi berbasis angka."
+        ),
         agent=monitor_agent,
         callback=lambda _: time.sleep(15),
     )
+
     task_predict = Task(
         description=(
-            f"Prediksi risiko {city} terkait: '{user_query[:100]}'\n"
-            f"Prakiraan: {json.dumps(forecast_days, ensure_ascii=False) if forecast_days else 'N/A'}\n"
-            "Fokus pada risiko yang relevan dengan pertanyaan user. Jawab singkat."
+            f"Pertanyaan user: '{user_query[:120]}'\n\n"
+            f"{DATA_CONTEXT}\n\n"
+            f"Prakiraan detail: {json.dumps(forecast_days, ensure_ascii=False) if forecast_days else 'Tidak tersedia'}\n\n"
+            "Ikuti langkah Chain-of-Thought:\n"
+            "1. ANALISIS TREN: Bagaimana tren cuaca 3 hari ke depan?\n"
+            "2. IDENTIFIKASI RISIKO: Risiko apa yang muncul dari tren ini?\n"
+            "3. MEKANISME: Jelaskan mekanisme kausal risiko tersebut\n"
+            "4. PROBABILITAS: Estimasi probabilitas (rendah <30% / sedang 30-60% / tinggi >60%)\n"
+            "5. MITIGASI: 2 langkah mitigasi spesifik dengan timeline\n\n"
+            "Format output wajib:\n"
+            "RISIKO UTAMA: [nama] | PROBABILITAS: [%] | TIMEFRAME: [kapan]\n"
+            "MEKANISME: [penjelasan kausal]\n"
+            "MITIGASI 1: [aksi] — [timeline]\n"
+            "MITIGASI 2: [aksi] — [timeline]"
         ),
-        expected_output="Risiko spesifik sesuai pertanyaan, tingkat kepercayaan, 2 saran.",
+        expected_output=(
+            "Prediksi risiko dengan probabilitas, mekanisme kausal, dan 2 mitigasi bertimeline."
+        ),
         agent=predict_agent,
         context=[task_monitor],
         callback=lambda _: time.sleep(15),
     )
+
     task_social = Task(
         description=(
-            f"Dampak sosial {city} terkait: '{user_query[:100]}'\n"
-            f"Data: kemiskinan={fmt('poverty_rate')}% air_bersih={fmt('clean_water_access')}% "
-            f"sanitasi={fmt('basic_sanitation')}%\n"
-            "Fokus pada dampak yang relevan dengan pertanyaan. Skor kerentanan 0-100. Jawab singkat."
+            f"Pertanyaan user: '{user_query[:120]}'\n\n"
+            f"{DATA_CONTEXT}\n\n"
+            f"{SOCIAL_CONTEXT}\n\n"
+            "Ikuti langkah Chain-of-Thought:\n"
+            "1. PROFIL KERENTANAN: Siapa kelompok paling rentan?\n"
+            "2. KAITAN DATA: Bagaimana data sosial-ekonomi memperburuk dampak lingkungan?\n"
+            "3. SKOR KERENTANAN: Hitung skor 0-100 (kemiskinan 30% + air bersih 25% + sanitasi 25% + AQI 20%)\n"
+            "4. DAMPAK SPESIFIK: Dampak pada tiap kelompok rentan\n"
+            "5. REKOMENDASI INKLUSIF: 2 solusi yang mempertimbangkan keterbatasan ekonomi\n\n"
+            "Format output wajib:\n"
+            "SKOR KERENTANAN SOSIAL: [angka]/100\n"
+            "KELOMPOK RENTAN: [daftar dengan estimasi jumlah]\n"
+            "KAITAN LINGKUNGAN-SOSIAL: [penjelasan kausal]\n"
+            "REKOMENDASI: [2 solusi inklusif]"
         ),
-        expected_output="Skor kerentanan, kelompok rentan relevan, 2 rekomendasi inklusif.",
+        expected_output=(
+            "Skor kerentanan sosial dengan breakdown, kelompok rentan, "
+            "kaitan kausal lingkungan-sosial, dan 2 rekomendasi inklusif."
+        ),
         agent=social_agent,
         context=[task_monitor],
         callback=lambda _: time.sleep(15),
     )
+
     task_ethics = Task(
         description=(
-            f"Audit etika analisis {city} terkait: '{user_query[:80]}'\n"
-            "Periksa: apakah data valid, apakah ada klaim tanpa data, apakah rekomendasi realistis.\n"
-            "Skor etika 0-100, 3 temuan singkat (✅/⚠️)."
+            f"Audit etika analisis {city} untuk: '{user_query[:100]}'\n\n"
+            "Periksa output agen sebelumnya dengan kriteria:\n"
+            "1. VALIDITAS DATA (0-25 poin): Apakah setiap klaim didukung data nyata?\n"
+            "2. TRANSPARANSI (0-25 poin): Apakah keterbatasan data disebutkan eksplisit?\n"
+            "3. KEADILAN (0-25 poin): Apakah rekomendasi dapat diakses semua lapisan?\n"
+            "4. AKURASI (0-25 poin): Apakah angka dan persentase konsisten?\n\n"
+            "Format output wajib:\n"
+            "SKOR ETIKA: [total]/100\n"
+            "✅/⚠️ Validitas: [temuan]\n"
+            "✅/⚠️ Transparansi: [temuan]\n"
+            "✅/⚠️ Keadilan: [temuan]\n"
+            "CATATAN: [keterbatasan data yang perlu diungkapkan ke user]"
         ),
-        expected_output="Skor etika, 3 temuan, catatan validitas data.",
+        expected_output=(
+            "Skor etika 0-100 dengan breakdown 4 dimensi dan catatan keterbatasan data."
+        ),
         agent=ethics_agent,
         context=[task_monitor, task_predict, task_social],
         callback=lambda _: time.sleep(15),
     )
+
     task_report = Task(
         description=(
-            f"Buat laporan EcoGuardian untuk {city} yang MENJAWAB LANGSUNG: \"{user_query[:150]}\"\n\n"
-            "PENTING: Kamu HANYA boleh menjawab berdasarkan data yang tersedia:\n"
-            "- Kualitas udara (AQI, PM2.5) dari WAQI\n"
-            "- Cuaca real-time dari OpenWeatherMap\n"
-            "- Prakiraan cuaca dari Open-Meteo\n"
-            "- Data sosial dari World Bank\n"
-            "Jika pertanyaan di luar data tersebut (gempa, banjir historis, dll), "
-            "nyatakan dengan jelas bahwa data tidak tersedia dan sarankan sumber resmi.\n\n"
-            "Format wajib:\n"
-            "1. KONDISI SAAT INI — jelaskan MENGAPA kondisi ini terjadi (reasoning eksplisit)\n"
-            "2. PREDIKSI RISIKO — sertakan tingkat kepercayaan prediksi\n"
-            "3. DAMPAK SOSIAL — fokus pada kelompok rentan dan ketidaksetaraan\n"
-            "4. CATATAN ETIKA — transparansi keterbatasan data\n"
-            "5. RENCANA AKSI — 3 aksi dengan format:\n"
-            "   [PRIORITAS: tinggi/sedang/rendah] [PELAKU: siapa] [AKSI: apa] [DAMPAK: dampak terukur dalam angka/persentase]\n\n"
-            "Setiap rekomendasi HARUS menyertakan alasan berbasis data mengapa aksi itu dipilih.\n"
-            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+            f"Buat laporan EcoGuardian untuk {city}.\n\n"
+            f"JAWAB LANGSUNG pertanyaan ini di paragraf pertama: \"{user_query[:150]}\"\n\n"
+            f"{DATA_CONTEXT}\n\n"
+            "FORMAT WAJIB — tulis persis dengan heading ini:\n\n"
+            "1. KONDISI SAAT INI\n"
+            "Jawab pertanyaan user langsung. Gunakan format reasoning:\n"
+            "[Observasi data dengan angka] → [Interpretasi standar WHO/ISPU] → [Kausalitas mengapa terjadi]\n\n"
+            "2. PREDIKSI RISIKO\n"
+            "Format: [Risiko] | Probabilitas: [%] | Timeframe: [kapan] | Mekanisme: [mengapa]\n\n"
+            "3. DAMPAK SOSIAL\n"
+            "Format: [Kelompok] → [Dampak spesifik] → [Kaitan data sosial-ekonomi]\n\n"
+            "4. CATATAN ETIKA\n"
+            "Sebutkan apa yang TIDAK bisa disimpulkan dari data ini. Transparansi keterbatasan.\n\n"
+            "5. RENCANA AKSI\n"
+            "Tepat 3 aksi, format wajib:\n"
+            "[PRIORITAS: tinggi/sedang/rendah] [PELAKU: siapa] [AKSI: tindakan spesifik] "
+            "[DAMPAK: dampak terukur dalam angka/persentase]\n"
+            "Sertakan alasan berbasis data untuk setiap aksi.\n\n"
+            "Baris terakhir (wajib): RISK_LEVEL: rendah/sedang/tinggi/kritis"
         ),
-        expected_output="Laporan 5 bagian dengan reasoning eksplisit dan dampak terukur, diakhiri RISK_LEVEL.",
+        expected_output=(
+            "Laporan 5 bagian dengan Chain-of-Thought reasoning, angka spesifik, "
+            "3 rencana aksi terstruktur, diakhiri RISK_LEVEL."
+        ),
         agent=report_agent,
         context=[task_monitor, task_predict, task_social, task_ethics],
     )
