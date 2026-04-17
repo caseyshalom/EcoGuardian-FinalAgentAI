@@ -16,6 +16,9 @@ from pydantic import BaseModel
 
 load_dotenv()
 
+import warnings
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
 import logging
 logging.getLogger("supabase_db").setLevel(logging.WARNING)
 logging.getLogger("httpx").setLevel(logging.WARNING)
