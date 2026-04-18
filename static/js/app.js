@@ -272,18 +272,20 @@ function renderResult(data) {
   ];
 
   // Deteksi fokus dari query untuk filter section
-  const q = (data.query || document.getElementById("queryInput")?.value || "").toLowerCase();
+  const q = (data.query || document.getElementById("queryInput")?.value || "").toLowerCase().trim();
   let visibleSections;
-  if (/rekomendasi aksi|rencana aksi|aksi konkret/.test(q)) {
+  if (!q || /analisis lengkap/.test(q)) {
+    visibleSections = null; // tampilkan semua
+  } else if (/rekomendasi aksi konkret|^rencana aksi/.test(q)) {
     visibleSections = ["RENCANA AKSI"];
-  } else if (/prediksi.*hari|prakiraan|7 hari/.test(q)) {
+  } else if (/7 hari ke depan|prediksi risiko lingkungan 7/.test(q)) {
     visibleSections = ["PREDIKSI RISIKO", "RENCANA AKSI"];
-  } else if (/kualitas udara|aqi|pm2\.5|polusi/.test(q)) {
+  } else if (/kondisi kualitas udara hari ini/.test(q)) {
     visibleSections = ["KONDISI SAAT INI", "RENCANA AKSI"];
-  } else if (/dampak sosial|kelompok.*rentan|masyarakat.*rentan/.test(q)) {
+  } else if (/kelompok masyarakat mana yang paling rentan/.test(q)) {
     visibleSections = ["DAMPAK SOSIAL", "RENCANA AKSI"];
   } else {
-    visibleSections = null; // tampilkan semua
+    visibleSections = null; // query custom — tampilkan semua
   }
 
   // Parse teks jadi sections
