@@ -249,14 +249,14 @@ def parse_action_plan(text: str) -> list:
 def _detect_focus(query: str) -> str:
     """Deteksi fokus utama dari query user."""
     q = query.lower()
+    if any(w in q for w in ["rekomendasi aksi", "rencana aksi", "aksi konkret", "langkah pencegahan", "solusi", "tindakan"]):
+        return "aksi"
     if any(w in q for w in ["cuaca", "hujan", "suhu", "angin", "prakiraan", "prediksi", "iklim", "banjir", "kekeringan"]):
         return "cuaca"
-    if any(w in q for w in ["udara", "aqi", "pm2.5", "polusi", "polutan", "asap"]):
+    if any(w in q for w in ["udara", "aqi", "pm2.5", "polusi", "polutan", "asap", "kualitas udara"]):
         return "kualitas_udara"
-    if any(w in q for w in ["sosial", "masyarakat", "rentan", "miskin", "kemiskinan", "sanitasi"]):
+    if any(w in q for w in ["sosial", "masyarakat", "rentan", "miskin", "kemiskinan", "sanitasi", "kelompok"]):
         return "sosial"
-    if any(w in q for w in ["aksi", "rekomendasi", "solusi", "langkah", "tindakan"]):
-        return "aksi"
     return "lengkap"
 
 
@@ -442,31 +442,63 @@ def build_crew(env_data: dict, user_query: str, city: str):
     )
 
     FOCUS_INSTRUCTIONS = {
-        "cuaca":        "FOKUS: CUACA. Kondisi&prediksi 7hari detail, dampak sosial ringkas 1 kalimat.",
-        "kualitas_udara": "FOKUS: KUALITAS UDARA. AQI&PM2.5 detail, sosial ringkas 1 kalimat.",
-        "sosial":       "FOKUS: DAMPAK SOSIAL. Kelompok rentan detail, kondisi ringkas 2 kalimat.",
-        "aksi":         "FOKUS: RENCANA AKSI. 3 aksi sangat spesifik+timeline+indikator.",
-        "lengkap":      "FOKUS: ANALISIS LENGKAP seimbang.",
+        "kualitas_udara": (
+            "OUTPUT HANYA section ini (jangan tulis section lain):\n"
+            "1. KONDISI SAAT INI\n"
+            "Fokus HANYA pada AQI, PM2.5, polutan dominan, dan dampaknya pada kesehatan.\n"
+            "Gunakan angka spesifik dan bandingkan dengan standar WHO/ISPU.\n\n"
+            "5. RENCANA AKSI\n"
+            "3 aksi fokus pengurangan polusi udara.\n"
+            "[PRIORITAS:x] [PELAKU:x] [AKSI:x] [DAMPAK:x]\n\n"
+            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+        ),
+        "cuaca": (
+            "OUTPUT HANYA section ini (jangan tulis section lain):\n"
+            "2. PREDIKSI RISIKO\n"
+            "Uraikan prakiraan cuaca 7 hari per periode (hari 1-2, hari 3-4, hari 5-7).\n"
+            "Sebutkan suhu, curah hujan, angin per periode. Identifikasi hari paling berisiko.\n"
+            "Format: TREN 7 HARI: [uraian] | RISIKO: [nama] PROBABILITAS: [%] | MITIGASI: [aksi]\n\n"
+            "5. RENCANA AKSI\n"
+            "3 aksi fokus mitigasi cuaca/banjir.\n"
+            "[PRIORITAS:x] [PELAKU:x] [AKSI:x] [DAMPAK:x]\n\n"
+            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+        ),
+        "sosial": (
+            "OUTPUT HANYA section ini (jangan tulis section lain):\n"
+            "3. DAMPAK SOSIAL\n"
+            "Hitung skor kerentanan 0-100. Identifikasi kelompok rentan dengan estimasi jumlah.\n"
+            "Hubungkan data kemiskinan/sanitasi/air bersih dengan risiko lingkungan.\n"
+            "Format: SKOR KERENTANAN: [n]/100 | KELOMPOK: [list] | KAITAN: [kausal]\n\n"
+            "5. RENCANA AKSI\n"
+            "3 aksi fokus sosial dan inklusif.\n"
+            "[PRIORITAS:x] [PELAKU:x] [AKSI:x] [DAMPAK:x]\n\n"
+            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+        ),
+        "aksi": (
+            "OUTPUT HANYA section ini (jangan tulis section lain):\n"
+            "5. RENCANA AKSI\n"
+            "Buat TEPAT 3 aksi konkret berbasis data yang tersedia.\n"
+            "Setiap aksi WAJIB format:\n"
+            "[PRIORITAS: tinggi/sedang/rendah] [PELAKU: siapa spesifik] [AKSI: tindakan detail] [DAMPAK: angka terukur]\n"
+            "Sertakan alasan berbasis data untuk setiap aksi.\n\n"
+            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+        ),
+        "lengkap": (
+            "Tulis SEMUA 5 section:\n"
+            "1. KONDISI SAAT INI\n2. PREDIKSI RISIKO\n3. DAMPAK SOSIAL\n4. CATATAN ETIKA\n5. RENCANA AKSI\n"
+            "Berikan porsi seimbang untuk semua section.\n\n"
+            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+        ),
     }
     focus_instruction = FOCUS_INSTRUCTIONS.get(focus, FOCUS_INSTRUCTIONS["lengkap"])
 
     task_report = Task(
         description=(
-            f"Laporan EcoGuardian {city}. Jawab langsung: \"{user_query[:100]}\"\n"
-            f"{focus_instruction}\n{DATA_CONTEXT}\n\n"
-            "FORMAT WAJIB:\n"
-            "1. KONDISI SAAT INI\n[Observasi→Interpretasi WHO/ISPU→Kausalitas]\n\n"
-            "2. PREDIKSI RISIKO\n[Risiko|Probabilitas:%|Timeframe|Mekanisme]\n\n"
-            "3. DAMPAK SOSIAL\n[Kelompok→Dampak→Kaitan sosial-ekonomi]\n\n"
-            "4. CATATAN ETIKA\n[Keterbatasan data]\n\n"
-            "5. RENCANA AKSI\n"
-            "[PRIORITAS:tinggi/sedang/rendah] [PELAKU:siapa] [AKSI:apa] [DAMPAK:terukur]\n"
-            "(ulangi 3x untuk 3 aksi berbeda)\n\n"
-            "Baris terakhir: RISK_LEVEL: rendah/sedang/tinggi/kritis"
+            f"Laporan EcoGuardian {city}. Jawab: \"{user_query[:100]}\"\n"
+            f"{DATA_CONTEXT}\n\n"
+            f"{focus_instruction}"
         ),
-        expected_output=(
-            "Laporan 5 bagian, 3 rencana aksi terstruktur, diakhiri RISK_LEVEL."
-        ),
+        expected_output="Laporan sesuai fokus dengan 3 rencana aksi terstruktur, diakhiri RISK_LEVEL.",
         agent=report_agent,
         context=[task_monitor, task_predict, task_social, task_ethics],
     )

@@ -263,6 +263,21 @@ function renderResult(data) {
     { key: "RENCANA AKSI",      emoji: "✅", color: "#7c3aed",        bg: "var(--surface2)", border: "var(--border2)" },
   ];
 
+  // Deteksi fokus dari query untuk filter section
+  const q = (data.query || document.getElementById("queryInput")?.value || "").toLowerCase();
+  let visibleSections;
+  if (/rekomendasi aksi|rencana aksi|aksi konkret/.test(q)) {
+    visibleSections = ["RENCANA AKSI"];
+  } else if (/prediksi.*hari|prakiraan|7 hari/.test(q)) {
+    visibleSections = ["PREDIKSI RISIKO", "RENCANA AKSI"];
+  } else if (/kualitas udara|aqi|pm2\.5|polusi/.test(q)) {
+    visibleSections = ["KONDISI SAAT INI", "RENCANA AKSI"];
+  } else if (/dampak sosial|kelompok.*rentan|masyarakat.*rentan/.test(q)) {
+    visibleSections = ["DAMPAK SOSIAL", "RENCANA AKSI"];
+  } else {
+    visibleSections = null; // tampilkan semua
+  }
+
   // Parse teks jadi sections
   function parseSections(text) {
     const result = {};
@@ -290,6 +305,8 @@ function renderResult(data) {
   if (hasAny) {
     const bubbles = sections.map(s => {
       const content = parsed[s.key] || "";
+      // Filter section berdasarkan fokus
+      if (visibleSections && !visibleSections.includes(s.key)) return "";
       if (!content) return "";
       // Format rencana aksi jadi list
       let body = content;
