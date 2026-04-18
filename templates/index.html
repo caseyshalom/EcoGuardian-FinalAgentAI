@@ -175,17 +175,21 @@
         Audit Etika
       </button>
       <button class="nav-item" onclick="showPage('kemajuan',this)">
-        <svg
-          viewBox="0 0 16 16"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.5"
-        >
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
           <rect x="2" y="10" width="3" height="4" rx="1" />
           <rect x="6.5" y="7" width="3" height="7" rx="1" />
           <rect x="11" y="4" width="3" height="10" rx="1" />
         </svg>
         Lacak Kemajuan
+      </button>
+      <button class="nav-item" onclick="showPage('sosial',this)">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+          <circle cx="6" cy="5" r="2.5"/>
+          <path d="M1 13c0-2.5 2-4 5-4s5 1.5 5 4"/>
+          <circle cx="12" cy="5" r="2"/>
+          <path d="M12 9c1.5.3 3 1.2 3 3"/>
+        </svg>
+        Dampak Sosial
       </button>
       <div class="sidebar-footer">
         <div class="user-chip" onclick="toggleGuardian()" style="cursor:pointer" title="Buka Guardian AI">
@@ -1419,6 +1423,53 @@
 
         <!-- ===== PAGE: STATISTIK dihapus, dipindah ke Ringkasan ===== -->
 
+        <!-- ===== PAGE: DAMPAK SOSIAL ===== -->
+        <div class="page" id="page-sosial">
+          <div class="summary-hero" style="margin-bottom:20px">
+            <div class="hero-label">Dampak Sosial</div>
+            <div class="hero-title">Analisis Kerentanan Sosial</div>
+            <div class="hero-sub">Data real-time dari World Bank, WAQI, dan OpenWeatherMap</div>
+            <div class="hero-stats">
+              <div class="hero-stat"><div class="val" id="chi-hero-score">—</div><div class="lbl">CHI Score</div></div>
+              <div class="hero-stat"><div class="val" id="chi-hero-label">—</div><div class="lbl">Status</div></div>
+              <div class="hero-stat"><div class="val" id="social-hero-affected">—</div><div class="lbl">Warga Terdampak</div></div>
+            </div>
+          </div>
+          <div id="socialCityInfo" style="font-size:0.78rem;color:var(--text3);margin-bottom:16px">
+            📍 Jalankan analisis kota untuk melihat data sosial.
+          </div>
+          <div class="card" style="margin-bottom:14px;border-left:3px solid var(--green)">
+            <div class="card-head">
+              <div><div class="card-title">🏥 Community Health Index (CHI)</div><div class="card-sub">Skor gabungan kesehatan lingkungan & sosial (0–100)</div></div>
+              <span class="sc-badge badge-green" id="chi-badge">—</span>
+            </div>
+            <div id="chi-content"><div class="empty-state"><div class="empty-icon">🏥</div><div class="empty-title">Belum ada data</div><div class="empty-desc">Jalankan analisis kota terlebih dahulu</div></div></div>
+          </div>
+          <div class="card" style="margin-bottom:14px;border-left:3px solid var(--amber)">
+            <div class="card-head">
+              <div><div class="card-title">🗺️ Peta Kerentanan Sosial</div><div class="card-sub">Dimensi kerentanan berdasarkan data World Bank & WAQI</div></div>
+            </div>
+            <div id="vulnerability-heatmap-content"><div class="empty-state"><div class="empty-icon">🗺️</div><div class="empty-title">Belum ada data</div></div></div>
+          </div>
+          <div class="card" style="margin-bottom:14px;border-left:3px solid var(--blue)">
+            <div class="card-head">
+              <div><div class="card-title">📊 Estimasi Dampak Sosial</div><div class="card-sub">Perkiraan warga terdampak, hari kerja hilang, biaya kesehatan</div></div>
+            </div>
+            <div id="social-timeline-content"><div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Belum ada data</div></div></div>
+          </div>
+          <div class="two-col" style="margin-bottom:14px">
+            <div class="card" style="border-left:3px solid var(--red)">
+              <div class="card-head"><div class="card-title">🎯 Radar Kerentanan Kelompok</div><div class="card-sub">Skor kerentanan per kelompok sosial</div></div>
+              <svg id="radarSvg" viewBox="0 0 400 340" style="width:100%;display:none"></svg>
+              <div id="radar-chart-content"></div>
+            </div>
+            <div class="card" style="border-left:3px solid var(--teal)">
+              <div class="card-head"><div><div class="card-title">🤝 Rekomendasi Aksi Komunitas</div><div class="card-sub">Per aktor sosial berdasarkan kondisi saat ini</div></div></div>
+              <div id="community-actions-content"><div class="empty-state"><div class="empty-icon">🤝</div><div class="empty-title">Belum ada data</div></div></div>
+            </div>
+          </div>
+        </div>
+
       </div>
       <!-- ═══════════════ WATERMARK ═══════════════ -->
       <div style="
@@ -1445,6 +1496,8 @@
       </div>
     </div>
 
+  <!-- ═══════════════ PAGE: DAMPAK SOSIAL ═══════════════ -->
+  <!-- Halaman ini sepenuhnya terpisah, tidak mengubah halaman lain -->
 
   <!-- ═══════════════ AGENT DETAIL MODAL ═══════════════ -->
   <div id="agentModal" onclick="closeAgentModal(event)" style="
@@ -1513,5 +1566,6 @@
   </div>
 
   <script src="/static/js/app.js"></script>
+  <script src="/static/js/social_features.js"></script>
 </body>
 </html>
