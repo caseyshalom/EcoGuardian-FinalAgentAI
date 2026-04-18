@@ -272,18 +272,20 @@ function renderResult(data) {
   ];
 
   // Deteksi fokus dari query untuk filter section
-  const q = (data.query || document.getElementById("queryInput")?.value || "").toLowerCase().trim();
+  const q = (data.query || "").toLowerCase().trim();
+
+  // Exact match ke query tombol cepat
+  const QUICK_QUERIES = {
+    "bagaimana kondisi kualitas udara hari ini dan siapa yang paling terdampak?": ["KONDISI SAAT INI"],
+    "prediksi risiko lingkungan 7 hari ke depan dan langkah pencegahannya": ["PREDIKSI RISIKO"],
+    "kelompok masyarakat mana yang paling rentan dan apa yang perlu dilakukan?": ["DAMPAK SOSIAL"],
+    "rekomendasi aksi konkret untuk mengurangi risiko polusi dan ketimpangan akses": ["RENCANA AKSI"],
+    "analisis lengkap kondisi lingkungan, prediksi risiko, dan dampak sosial": null,
+  };
+
   let visibleSections;
-  if (!q || /analisis lengkap/.test(q)) {
-    visibleSections = null; // tampilkan semua
-  } else if (/rekomendasi aksi konkret|^rencana aksi/.test(q)) {
-    visibleSections = ["RENCANA AKSI"];
-  } else if (/7 hari ke depan|prediksi risiko lingkungan 7/.test(q)) {
-    visibleSections = ["PREDIKSI RISIKO", "RENCANA AKSI"];
-  } else if (/kondisi kualitas udara hari ini/.test(q)) {
-    visibleSections = ["KONDISI SAAT INI", "RENCANA AKSI"];
-  } else if (/kelompok masyarakat mana yang paling rentan/.test(q)) {
-    visibleSections = ["DAMPAK SOSIAL", "RENCANA AKSI"];
+  if (q in QUICK_QUERIES) {
+    visibleSections = QUICK_QUERIES[q]; // null = tampilkan semua
   } else {
     visibleSections = null; // query custom — tampilkan semua
   }

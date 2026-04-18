@@ -133,6 +133,7 @@ async def analyze(req: QueryRequest):
     )
 
     result["session_id"] = session_id
+    result["query"] = req.query
     return result
 
 
