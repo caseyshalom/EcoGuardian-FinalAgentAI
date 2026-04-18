@@ -38,6 +38,12 @@ function renderCHI(chi, socialData) {
   const score = chi.score;
   const color = chi.color;
 
+  // Update hero stats
+  const heroScore = document.getElementById("chi-hero-score");
+  const heroLabel = document.getElementById("chi-hero-label");
+  if (heroScore) heroScore.textContent = score;
+  if (heroLabel) heroLabel.textContent = chi.label;
+
   if (badge) {
     badge.textContent = chi.label;
     badge.className = "sc-badge " + (score >= 80 ? "badge-green" : score >= 60 ? "badge-teal" : score >= 40 ? "badge-amber" : "badge-red");
@@ -119,6 +125,13 @@ function renderVulnerabilityHeatmap(dimensions) {
 function renderSocialTimeline(impact) {
   const el = document.getElementById("social-timeline-content");
   if (!el || !impact) return;
+
+  // Update hero stat
+  const heroAffected = document.getElementById("social-hero-affected");
+  if (heroAffected) {
+    const n = impact.affected_people;
+    heroAffected.textContent = n >= 1000000 ? (n/1000000).toFixed(1)+"jt" : n >= 1000 ? (n/1000).toFixed(0)+"rb" : n;
+  }
 
   const riskColors = { rendah: "#22c55e", sedang: "#f59e0b", tinggi: "#ef4444", kritis: "#dc2626" };
   const riskColor = riskColors[impact.risk_level] || "#f59e0b";
