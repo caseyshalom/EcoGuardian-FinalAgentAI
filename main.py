@@ -388,19 +388,17 @@ async def get_weather_forecast(city: str, country_code: str = "ID"):
 @app.post("/api/guardian-chat")
 async def guardian_chat(req: dict):
     """Guardian AI Chat — tanya jawab seputar lingkungan dan analisis."""
-    from groq import Groq
+    import httpx
     message = req.get("message", "").strip()
-    context = req.get("context", "")  # data analisis terakhir
-    history = req.get("history", [])  # riwayat chat
+    context = req.get("context", "")
+    history = req.get("history", [])
 
     if not message:
         raise HTTPException(status_code=400, detail="Pesan tidak boleh kosong")
 
-    api_key = os.getenv("GROQ_API_KEY", "")
+    api_key = os.getenv("OPENROUTER_API_KEY", "")
     if not api_key:
-        raise HTTPException(status_code=500, detail="GROQ_API_KEY tidak ditemukan")
-
-    client = Groq(api_key=api_key)
+        raise HTTPException(status_code=500, detail="OPENROUTER_API_KEY tidak ditemukan")
 
     system_prompt = """Kamu adalah Guardian, asisten AI EcoGuardian yang cerdas, responsif, dan peduli lingkungan.
 Kamu seperti JARVIS — pintar, to the point, dan selalu siap membantu.
@@ -412,19 +410,30 @@ Jika ada data analisis terbaru, gunakan sebagai konteks jawaban."""
         system_prompt += f"\n\nData analisis terbaru:\n{context[:800]}"
 
     messages = [{"role": "system", "content": system_prompt}]
-    for h in history[-6:]:  # max 6 pesan terakhir
+    for h in history[-6:]:
         messages.append({"role": h["role"], "content": h["content"]})
     messages.append({"role": "user", "content": message})
 
     try:
-        chat = client.chat.completions.create(
-            model="llama-3.1-8b-instant",
-            messages=messages,
-            max_tokens=1024,
-            temperature=0.7,
-        )
-        reply = chat.choices[0].message.content.strip()
-        return {"reply": reply, "success": True}
+        async with httpx.AsyncClient(timeout=30) as client:
+            resp = await client.post(
+                "https://openrouter.ai/api/v1/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {api_key}",
+                    "Content-Type": "application/json",
+                    "HTTP-Referer": "https://ecoguardian.ai",
+                    "X-Title": "EcoGuardian AI",
+                },
+                json={
+                    "model": "nvidia/nemotron-3-super",
+                    "messages": messages,
+                    "max_tokens": 1024,
+                    "temperature": 0.7,
+                }
+            )
+            data = resp.json()
+            reply = data["choices"][0]["message"]["content"].strip()
+            return {"reply": reply, "success": True}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -559,7 +568,7 @@ async def health():
         "ai": {
             "groq": {
                 "active": True,
-                "model": "llama-4-scout-17b-16e-instruct"
+                "model": "nvidia/nemotron-3-super (OpenRouter)"
             }
         }
     }
