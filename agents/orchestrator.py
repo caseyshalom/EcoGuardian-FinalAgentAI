@@ -157,18 +157,33 @@ async def fetch_all_env_data(city: str, country_code: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def parse_action_plan(text: str) -> list:
-    """
-    Ekstrak rencana aksi terstruktur dari teks laporan.
-    Support berbagai format output LLM.
-    """
+    """Ekstrak rencana aksi dari teks laporan. Support berbagai format output LLM."""
     import re as _re
     actions = []
 
+    def norm_prio(p: str) -> str:
+        p = p.strip().lower()
+        if p in ("1", "tinggi", "high"): return "tinggi"
+        if p in ("2", "sedang", "medium", "moderate"): return "sedang"
+        if p in ("3", "rendah", "low"): return "rendah"
+        return p if p in ("tinggi", "sedang", "rendah") else "sedang"
+
+    # Hapus baris instruksi template yang ikut ke output
+    clean_lines = []
+    for line in text.split("\n"):
+        s = line.strip()
+        if _re.match(r'^["\']?3 aksi fokus', s, _re.IGNORECASE): continue
+        if _re.match(r'^\[PRIORITAS:x\]', s, _re.IGNORECASE): continue
+        if _re.match(r'^Buat TEPAT 3 aksi', s, _re.IGNORECASE): continue
+        if _re.match(r'^OUTPUT HANYA', s, _re.IGNORECASE): continue
+        clean_lines.append(line)
+    text = "\n".join(clean_lines)
+
     # Format 1: [PRIORITAS: x] [PELAKU: x] [AKSI: x] [DAMPAK: x]
-    pattern1 = r'\[PRIORITAS:\s*(\w+)\]\s*\[PELAKU:\s*([^\]]+)\]\s*\[AKSI:\s*([^\]]+)\]\s*\[DAMPAK:\s*([^\]]+)\]'
+    pattern1 = r'\[PRIORITAS:\s*([^\]]+)\]\s*\[PELAKU:\s*([^\]]+)\]\s*\[AKSI:\s*([^\]]+)\]\s*\[DAMPAK:\s*([^\]]+)\]'
     for m in _re.findall(pattern1, text, _re.IGNORECASE):
         actions.append({
-            "prioritas": m[0].strip().lower(),
+            "prioritas": norm_prio(m[0]),
             "pelaku": m[1].strip(),
             "aksi": m[2].strip(),
             "dampak": m[3].strip(),
@@ -176,11 +191,11 @@ def parse_action_plan(text: str) -> list:
     if actions:
         return actions[:6]
 
-    # Format 2: PRIORITAS: x PELAKU: x AKSI: x DAMPAK: x (tanpa kurung siku, satu baris)
-    pattern2 = r'PRIORITAS:\s*(\w+)\s+PELAKU:\s*(.+?)\s+AKSI:\s*(.+?)\s+DAMPAK:\s*(.+?)(?=PRIORITAS:|$)'
+    # Format 2: satu baris tanpa kurung siku
+    pattern2 = r'PRIORITAS:\s*(\S+)\s+PELAKU:\s*(.+?)\s+AKSI:\s*(.+?)\s+DAMPAK:\s*(.+?)(?=PRIORITAS:|$)'
     for m in _re.findall(pattern2, text, _re.IGNORECASE | _re.DOTALL):
         actions.append({
-            "prioritas": m[0].strip().lower(),
+            "prioritas": norm_prio(m[0]),
             "pelaku": _re.sub(r'\s+', ' ', m[1]).strip().rstrip('*'),
             "aksi": _re.sub(r'\s+', ' ', m[2]).strip().rstrip('*'),
             "dampak": _re.sub(r'\s+', ' ', m[3]).strip().rstrip('*'),
@@ -188,18 +203,18 @@ def parse_action_plan(text: str) -> list:
     if actions:
         return actions[:6]
 
-    # Format 3: multi-line — PRIORITAS: di satu baris, PELAKU/AKSI/DAMPAK di baris berikutnya
+    # Format 3: multi-line
     lines = text.split("\n")
     i = 0
     while i < len(lines):
         line = lines[i].strip()
-        prio_match = _re.match(r'PRIORITAS:\s*(\w+)', line, _re.IGNORECASE)
+        prio_match = _re.match(r'PRIORITAS:\s*(\S+)', line, _re.IGNORECASE)
         if prio_match:
-            prio = prio_match.group(1).strip().lower()
+            prio = norm_prio(prio_match.group(1))
             pelaku = aksi = dampak = ""
-            # Cari PELAKU, AKSI, DAMPAK di baris-baris berikutnya (max 6 baris)
-            for j in range(i+1, min(i+7, len(lines))):
+            for j in range(i+1, min(i+8, len(lines))):
                 l = lines[j].strip()
+                if _re.match(r'^PRIORITAS:', l, _re.IGNORECASE): break
                 pm = _re.match(r'PELAKU:\s*(.+)', l, _re.IGNORECASE)
                 am = _re.match(r'AKSI:\s*(.+)', l, _re.IGNORECASE)
                 dm = _re.match(r'DAMPAK:\s*(.+)', l, _re.IGNORECASE)
@@ -217,7 +232,7 @@ def parse_action_plan(text: str) -> list:
     if actions:
         return actions[:6]
 
-    # Format 4: baris bernomor di bagian Rencana Aksi
+    # Format 4: baris bernomor
     in_aksi = False
     for line in lines:
         line = line.strip()
