@@ -558,7 +558,7 @@ async def health():
         "ai": {
             "groq": {
                 "active": True,
-                "model": "llama-3.1-8b-instant"
+                "model": "llama-4-scout-17b-16e-instruct"
             }
         }
     }
