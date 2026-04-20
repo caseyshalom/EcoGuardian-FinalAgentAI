@@ -559,7 +559,7 @@ async def health():
         "ai": {
             "groq": {
                 "active": True,
-                "model": "nvidia/nemotron-3-super (OpenRouter)"
+                "model": "llama-4-scout-17b-16e-instruct (Groq)"
             }
         }
     }
