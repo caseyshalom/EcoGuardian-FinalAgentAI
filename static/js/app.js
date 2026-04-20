@@ -1187,25 +1187,25 @@ function renderAksiTerstruktur(actions, city) {
     <div style="
       background:var(--surface2);
       border:1px solid var(--border);
-      border-radius:12px;
-      padding:16px 18px;
-      margin-bottom:10px;
+      border-radius:10px;
+      padding:10px 14px;
+      margin-bottom:6px;
       transition:all .2s;
       cursor:pointer;
     " id="aksi-${i}" onclick="openAksiModal(${i})"
        onmouseover="this.style.borderColor='var(--border2)';this.style.transform='translateY(-1px)'"
        onmouseout="this.style.borderColor='var(--border)';this.style.transform=''">
       <!-- Baris atas: badge prioritas + pelaku -->
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
         <span style="
           background:${prio.badgeBg};
           color:${prio.textColor};
           border:1px solid ${prio.border};
-          font-size:0.7rem;font-weight:700;
-          padding:3px 10px;border-radius:6px;
+          font-size:0.68rem;font-weight:700;
+          padding:2px 8px;border-radius:5px;
           letter-spacing:.06em;
         ">${prio.label}</span>
-        <span style="font-size:0.78rem;color:var(--text3);display:flex;align-items:center;gap:4px">
+        <span style="font-size:0.75rem;color:var(--text3);display:flex;align-items:center;gap:4px">
           👤 ${a.pelaku}
         </span>
         <div class="aksi-check" id="check-${i}"
@@ -1214,11 +1214,11 @@ function renderAksiTerstruktur(actions, city) {
           style="margin-left:auto"></div>
       </div>
       <!-- Judul aksi -->
-      <div style="font-size:0.92rem;font-weight:700;color:var(--text);line-height:1.5;margin-bottom:8px">
+      <div style="font-size:0.86rem;font-weight:700;color:var(--text);line-height:1.4;margin-bottom:4px">
         ${a.aksi}
       </div>
       <!-- Dampak -->
-      <div style="font-size:0.78rem;color:var(--text3);display:flex;align-items:flex-start;gap:6px">
+      <div style="font-size:0.75rem;color:var(--text3);display:flex;align-items:flex-start;gap:5px">
         <span>📊</span>
         <span>${a.dampak}</span>
       </div>
