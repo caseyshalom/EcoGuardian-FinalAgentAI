@@ -1235,21 +1235,21 @@ function openAksiModal(i) {
   document.getElementById("modalTitle").textContent = `Rencana Aksi ${i + 1}`;
   document.getElementById("modalDot").style.background = a.prioritas === "tinggi" ? "var(--red)" : a.prioritas === "rendah" ? "var(--green-d)" : "var(--amber)";
   document.getElementById("modalBody").innerHTML = `
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.7rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Prioritas</div>
-      <div style="font-weight:600">${prioLabel}</div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:0.68rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Prioritas</div>
+      <div style="font-weight:600;font-size:0.88rem">${prioLabel}</div>
     </div>
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.7rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Pelaku</div>
-      <div style="font-weight:600">👤 ${a.pelaku}</div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:0.68rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Pelaku</div>
+      <div style="font-weight:600;font-size:0.88rem">👤 ${a.pelaku}</div>
     </div>
-    <div style="margin-bottom:12px">
-      <div style="font-size:0.7rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Rencana Aksi</div>
-      <div style="line-height:1.7">${a.aksi}</div>
+    <div style="margin-bottom:8px">
+      <div style="font-size:0.68rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Rencana Aksi</div>
+      <div style="line-height:1.5;font-size:0.88rem">${a.aksi}</div>
     </div>
-    <div style="padding-top:12px;border-top:1px solid #e2e8e2">
-      <div style="font-size:0.7rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px">Dampak yang Diharapkan</div>
-      <div style="line-height:1.7;color:#4a6a4a">📊 ${a.dampak}</div>
+    <div style="padding-top:8px;border-top:1px solid #e2e8e2">
+      <div style="font-size:0.68rem;color:#7a967a;text-transform:uppercase;letter-spacing:.06em;margin-bottom:2px">Dampak yang Diharapkan</div>
+      <div style="line-height:1.5;color:#4a6a4a;font-size:0.88rem">📊 ${a.dampak}</div>
     </div>
   `;
   const modal = document.getElementById("agentModal");
