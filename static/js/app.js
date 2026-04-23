@@ -1,4 +1,4 @@
-/* Green AI — main.js (inline + overrides) */
+/* EverGreen AI — main.js (inline + overrides) */
 
 let sessionId = localStorage.getItem("eco_session") || "";
 let isLoading = false;
@@ -1011,12 +1011,12 @@ function capitalize(s) {
 // Health check
 fetch("/api/health")
   .then((r) => {
-    if (r.ok) showNotif("Green AI siap digunakan");
+    if (r.ok) showNotif("EverGreen AI siap digunakan");
   })
   .catch(() => {});
 
 
-/* Green AI — app.js */
+/* EverGreen AI — app.js */
 
 // Raw output penuh dari backend — diisi saat renderResult dipanggil
 const _agentRaw = { monitor: "", predict: "", social: "", ethics: "" };
@@ -2220,7 +2220,7 @@ const _thinkingMessages = {
     "Memvalidasi akurasi data yang digunakan...",
     "Menyusun laporan komprehensif berdasarkan semua temuan...",
     "Merumuskan rencana aksi yang konkret dan terukur...",
-    "Laporan final siap — analisis Green AI selesai.",
+    "Laporan final siap — analisis EverGreen AI selesai.",
   ],
 };
 
@@ -2543,12 +2543,12 @@ renderResult = function(data) {
   requestBrowserNotif();
   if (data.risk_level === "tinggi" || data.risk_level === "kritis") {
     sendBrowserNotif(
-      `⚠️ Green AI Alert — ${data.city}`,
+      `⚠️ EverGreen AI Alert — ${data.city}`,
       `Risiko ${data.risk_level.toUpperCase()} terdeteksi! AQI: ${data.metrics?.aqi || "N/A"}. Segera ambil tindakan.`
     );
   } else if (data.risk_level === "sedang") {
     sendBrowserNotif(
-      `ℹ️ Green AI — ${data.city}`,
+      `ℹ️ EverGreen AI — ${data.city}`,
       `Analisis selesai. Risiko sedang. AQI: ${data.metrics?.aqi || "N/A"}.`
     );
   }
@@ -2651,7 +2651,7 @@ function exportToPDF() {
   const printContent = `
     <!DOCTYPE html><html lang="id"><head>
     <meta charset="UTF-8">
-    <title>Laporan Green AI — ${city}</title>
+    <title>Laporan EverGreen AI — ${city}</title>
     <style>
       body { font-family: Arial, sans-serif; color: #1a2e1a; margin: 40px; font-size: 13px; }
       .header { border-bottom: 3px solid #16a34a; padding-bottom: 16px; margin-bottom: 24px; }
@@ -2674,7 +2674,7 @@ function exportToPDF() {
       @media print { body { margin: 20px; } }
     </style></head><body>
     <div class="header">
-      <div class="logo">🌿 Green AI</div>
+      <div class="logo">🌿 EverGreen AI</div>
       <div class="subtitle">Sistem Multi-Agent AI untuk Pemantauan Lingkungan dan Dampak Sosial</div>
       <div style="margin-top:12px;display:flex;align-items:center;gap:12px">
         <div><strong>${city}</strong></div>
@@ -2702,7 +2702,7 @@ function exportToPDF() {
     </div>` : ""}
 
     <div class="footer">
-      Laporan dibuat oleh Green AI — Powered by CrewAI + Groq<br>
+      Laporan dibuat oleh EverGreen AI — Powered by CrewAI + Groq<br>
       Data: WAQI, OpenWeatherMap, Open-Meteo, World Bank, BMKG
     </div>
     </body></html>
@@ -2884,7 +2884,7 @@ async function shareReport() {
       </div>
       <div style="padding-top:12px;border-top:1px solid var(--border)">
         <button onclick="
-          const txt = 'Green AI — ${lastResult.city} (Risiko: ${lastResult.risk_level})\\n' + document.getElementById('shareTextArea').value;
+          const txt = 'EverGreen AI — ${lastResult.city} (Risiko: ${lastResult.risk_level})\\n' + document.getElementById('shareTextArea').value;
           navigator.clipboard.writeText(txt).then(()=>showNotif('Teks berhasil disalin ke clipboard')).catch(()=>showNotif('Salin teks di bawah secara manual'));
         " style="padding:8px 16px;border-radius:8px;border:1px solid var(--teal);background:var(--teal-l);
                  color:var(--teal);font-size:0.8rem;font-weight:600;cursor:pointer;margin-bottom:10px">

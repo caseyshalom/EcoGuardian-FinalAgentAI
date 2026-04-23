@@ -1,5 +1,5 @@
 """
-Green AI - Agent Orchestrator (CrewAI)
+EverGreen AI - Agent Orchestrator (CrewAI)
 Pipeline: Monitor -> Predict -> Social -> Ethics -> Report
 Fitur:
 - Jawaban relevan dengan pertanyaan user
@@ -513,7 +513,7 @@ def build_crew(env_data: dict, user_query: str, city: str):
 
     task_report = Task(
         description=(
-            f"Laporan Green AI {city}. Jawab: \"{user_query[:100]}\"\n"
+            f"Laporan EverGreen AI {city}. Jawab: \"{user_query[:100]}\"\n"
             f"{DATA_CONTEXT}\n\n"
             f"{focus_instruction}"
         ),

@@ -1,4 +1,4 @@
-/* Green AI — Social Features (5 fitur dampak sosial) */
+/* EverGreen AI — Social Features (5 fitur dampak sosial) */
 
 // -- Load & render semua fitur sosial -----------------------------------------
 

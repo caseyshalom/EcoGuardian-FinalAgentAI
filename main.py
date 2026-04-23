@@ -1,5 +1,5 @@
 """
-Green AI - FastAPI Backend
+EverGreen AI - FastAPI Backend
 Orkestrasi API untuk sistem multi-agent lingkungan dan dampak sosial.
 """
 
@@ -29,7 +29,7 @@ from agents.orchestrator import run_greenai_agents
 init_db()
 
 app = FastAPI(
-    title="Green AI",
+    title="EverGreen AI",
     description="Multi-Agent AI untuk Pemantauan Lingkungan dan Dampak Sosial",
     version="1.0.0"
 )
@@ -402,7 +402,7 @@ async def guardian_chat(req: dict):
 
     client = Groq(api_key=api_key)
 
-    system_prompt = """Kamu adalah Guardian, asisten AI Green AI yang cerdas, responsif, dan peduli lingkungan.
+    system_prompt = """Kamu adalah Guardian, asisten AI EverGreen AI yang cerdas, responsif, dan peduli lingkungan.
 Kamu seperti JARVIS — pintar, to the point, dan selalu siap membantu.
 Kamu ahli dalam: kualitas udara, cuaca, dampak sosial lingkungan, perubahan iklim, dan kebijakan lingkungan Indonesia.
 Jawab dalam Bahasa Indonesia yang natural dan informatif. Maksimal 3 paragraf per jawaban.
@@ -528,13 +528,13 @@ async def view_shared_report(share_id: str):
         response_html = (d.get("response") or "").replace("\n", "<br>")
         return HTMLResponse(f"""<!DOCTYPE html><html lang="id"><head>
         <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-        <title>Green AI — {d['city']}</title>
+        <title>EverGreen AI — {d['city']}</title>
         <style>body{{font-family:Arial,sans-serif;max-width:800px;margin:40px auto;padding:20px;color:#1a2e1a}}
         .header{{background:linear-gradient(135deg,#16a34a,#0d9488);color:#fff;padding:24px;border-radius:12px;margin-bottom:24px}}
         .metric{{display:inline-block;background:#f0f4f0;border-radius:8px;padding:12px 20px;margin:6px;text-align:center}}
         .mv{{font-size:1.5rem;font-weight:700;color:#16a34a}}.ml{{font-size:11px;color:#7a967a}}
         .body{{line-height:1.8;color:#4a6a4a}}</style></head><body>
-        <div class="header"><h1>🌿 Green AI</h1>
+        <div class="header"><h1>🌿 EverGreen AI</h1>
         <h2>{d['city']} — Risiko {d['risk_level'].upper()}</h2>
         <p style="opacity:.8">{d['created_at'][:10]}</p></div>
         <div style="margin-bottom:20px">
@@ -544,7 +544,7 @@ async def view_shared_report(share_id: str):
         </div>
         <div class="body">{response_html}</div>
         <p style="margin-top:40px;color:#7a967a;font-size:12px;text-align:center">
-        Dibuat oleh Green AI — <a href="/" style="color:#16a34a">Buka Dashboard</a></p>
+        Dibuat oleh EverGreen AI — <a href="/" style="color:#16a34a">Buka Dashboard</a></p>
         </body></html>""")
     except Exception as e:
         return HTMLResponse(f"<h1>Error: {e}</h1>")
@@ -554,7 +554,7 @@ async def view_shared_report(share_id: str):
 async def health():
     return {
         "status": "ok",
-        "service": "Green AI",
+        "service": "EverGreen AI",
         "version": "1.0.0",
         "ai": {
             "groq": {
