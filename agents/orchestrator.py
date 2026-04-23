@@ -1,5 +1,5 @@
 """
-EcoGuardian - Agent Orchestrator (CrewAI)
+Green AI - Agent Orchestrator (CrewAI)
 Pipeline: Monitor -> Predict -> Social -> Ethics -> Report
 Fitur:
 - Jawaban relevan dengan pertanyaan user
@@ -513,7 +513,7 @@ def build_crew(env_data: dict, user_query: str, city: str):
 
     task_report = Task(
         description=(
-            f"Laporan EcoGuardian {city}. Jawab: \"{user_query[:100]}\"\n"
+            f"Laporan Green AI {city}. Jawab: \"{user_query[:100]}\"\n"
             f"{DATA_CONTEXT}\n\n"
             f"{focus_instruction}"
         ),
@@ -534,7 +534,7 @@ def build_crew(env_data: dict, user_query: str, city: str):
 # Orchestrator utama
 # ---------------------------------------------------------------------------
 
-async def run_ecoguardian_agents(
+async def run_Green AI_agents(
     user_query: str,
     city: str = "Jakarta",
     country_code: str = "ID",

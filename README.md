@@ -1,4 +1,4 @@
-# 🌿 EcoGuardian AI
+# 🌿 Green AI
 
 Sistem multi-agent AI berbasis **CrewAI** untuk memantau kondisi lingkungan, memprediksi risiko iklim, dan menganalisis dampak sosial secara real-time. Didukung data dari berbagai API publik gratis dan LLM via Groq.
 
@@ -154,7 +154,7 @@ File tersebut akan membuat:
 
 Sudah termasuk index untuk performa query dan Row Level Security (RLS) dengan policy `allow_all` untuk anon key.
 
-> Jika Supabase tidak dikonfigurasi, sistem otomatis menggunakan SQLite lokal di `data/ecoguardian.db`.
+> Jika Supabase tidak dikonfigurasi, sistem otomatis menggunakan SQLite lokal di `data/Green AI.db`.
 
 ---
 

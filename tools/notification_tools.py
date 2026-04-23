@@ -1,5 +1,5 @@
 """
-EcoGuardian - Notification Tools
+Green AI - Notification Tools
 Kirim alert via Telegram dan laporan via Email secara otonom.
 """
 
@@ -32,7 +32,7 @@ def generate_report_text(
 
     lines = [
         "=" * 60,
-        f"  LAPORAN ECOGUARDIAN AI",
+        f"  LAPORAN Green AI",
         f"  {city.upper()} — {now}",
         "=" * 60,
         "",
@@ -74,7 +74,7 @@ def generate_report_text(
 
     lines += [
         "=" * 60,
-        "  Dibuat oleh EcoGuardian AI — Multi-Agent System",
+        "  Dibuat oleh Green AI — Multi-Agent System",
         "  Powered by CrewAI + Groq",
         "=" * 60,
     ]
@@ -87,7 +87,7 @@ def save_report_file(report_text: str, city: str) -> Path:
     reports_dir = Path("data/reports")
     reports_dir.mkdir(parents=True, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = reports_dir / f"ecoguardian_{city.lower().replace(' ', '_')}_{timestamp}.txt"
+    filename = reports_dir / f"Green AI_{city.lower().replace(' ', '_')}_{timestamp}.txt"
     filename.write_text(report_text, encoding="utf-8")
     return filename
 
@@ -126,13 +126,13 @@ async def send_telegram_alert(
         action_lines += f"\n{i}. [{a.get('prioritas','').upper()}] {a.get('aksi','')}"
 
     message = (
-        f"{risk_emoji} *ALERT ECOGUARDIAN — {city.upper()}*\n"
+        f"{risk_emoji} *ALERT Green AI — {city.upper()}*\n"
         f"━━━━━━━━━━━━━━━━━━━━━━\n"
         f"🌫️ AQI: `{aqi}` | 🌡️ Suhu: `{temp}°C` | 💨 PM2.5: `{pm25}`\n"
         f"⚠️ Risiko: *{risk_level.upper()}*\n\n"
         f"📋 *Ringkasan:*\n{summary}\n"
         f"\n🎯 *Rencana Aksi:*{action_lines}\n"
-        f"\n_Dikirim otomatis oleh EcoGuardian AI_"
+        f"\n_Dikirim otomatis oleh Green AI_"
     )
 
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
@@ -161,7 +161,7 @@ async def send_telegram_document(report_path: Path, city: str, risk_level: str) 
         return {"sent": False, "reason": "Telegram tidak dikonfigurasi"}
 
     url = f"https://api.telegram.org/bot{bot_token}/sendDocument"
-    caption = f"📄 Laporan lengkap EcoGuardian — {city} (Risiko: {risk_level})"
+    caption = f"📄 Laporan lengkap Green AI — {city} (Risiko: {risk_level})"
 
     try:
         async with httpx.AsyncClient(timeout=15) as client:
@@ -202,13 +202,13 @@ async def send_email_report(
     risk_emoji = {"rendah": "🟢", "sedang": "🟡", "tinggi": "🔴", "kritis": "🚨"}.get(risk_level, "⚪")
     now = datetime.now().strftime("%d %B %Y %H:%M")
 
-    subject = f"{risk_emoji} [EcoGuardian] Laporan Lingkungan {city} — Risiko {risk_level.upper()} ({now})"
+    subject = f"{risk_emoji} [Green AI] Laporan Lingkungan {city} — Risiko {risk_level.upper()} ({now})"
 
     # Body HTML email
     html_body = f"""
     <html><body style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;color:#1a2e1a">
       <div style="background:linear-gradient(135deg,#16a34a,#0d9488);padding:24px;border-radius:12px 12px 0 0">
-        <h1 style="color:#fff;margin:0;font-size:1.4rem">🌿 EcoGuardian AI</h1>
+        <h1 style="color:#fff;margin:0;font-size:1.4rem">🌿 Green AI</h1>
         <p style="color:rgba(255,255,255,0.85);margin:4px 0 0">Laporan Pemantauan Lingkungan & Dampak Sosial</p>
       </div>
       <div style="background:#f8faf8;padding:20px;border:1px solid #e2e8e2;border-top:none">
@@ -229,7 +229,7 @@ async def send_email_report(
         <hr style="border:1px solid #e2e8e2;margin:16px 0">
         <p style="font-size:0.85rem;color:#4a6a4a">
           Laporan lengkap terlampir dalam file .txt.<br>
-          Laporan ini dibuat secara otomatis oleh sistem multi-agent EcoGuardian AI
+          Laporan ini dibuat secara otomatis oleh sistem multi-agent Green AI
           menggunakan data real-time dari WAQI, OpenWeatherMap, Open-Meteo, dan World Bank.
         </p>
         <p style="font-size:0.8rem;color:#7a967a;margin-top:16px">
@@ -237,7 +237,7 @@ async def send_email_report(
         </p>
       </div>
       <div style="background:#e2e8e2;padding:12px;border-radius:0 0 12px 12px;text-align:center;font-size:0.75rem;color:#7a967a">
-        EcoGuardian AI — Powered by CrewAI + Groq | Data: WAQI, OpenWeatherMap, World Bank
+        Green AI — Powered by CrewAI + Groq | Data: WAQI, OpenWeatherMap, World Bank
       </div>
     </body></html>
     """
