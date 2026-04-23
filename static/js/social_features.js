@@ -1,4 +1,4 @@
-/* EverGreen AI — Social Features (5 fitur dampak sosial) */
+ï»¿/* EverGreen AI ï¿½ Social Features (5 fitur dampak sosial) */
 
 // -- Load & render semua fitur sosial -----------------------------------------
 
@@ -14,7 +14,7 @@ async function loadSocialFeatures() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
 
-    if (infoEl) infoEl.textContent = `Data sosial untuk ${data.city} — AQI: ${data.metrics.aqi} | Suhu: ${data.metrics.temperature}°C`;
+    if (infoEl) infoEl.textContent = `Data sosial untuk ${data.city} ï¿½ AQI: ${data.metrics.aqi} | Suhu: ${data.metrics.temperature}ï¿½C`;
 
     renderCHI(data.chi, data.social_data);
     renderVulnerabilityHeatmap(data.vulnerability_dimensions);
@@ -50,10 +50,10 @@ function renderCHI(chi, socialData) {
   }
 
   const components = [
-    { name: "Kualitas Udara", pct: Math.max(0, Math.min(100, Math.round(100 - (parseFloat(socialData.poverty_rate || 0) / 3)))), icon: "???", weight: "35%" },
-    { name: "Akses Air Bersih", pct: Math.round(socialData.clean_water_access || 0), icon: "??", weight: "25%" },
-    { name: "Sanitasi Dasar", pct: Math.round(socialData.basic_sanitation || 0), icon: "??", weight: "25%" },
-    { name: "Bebas Kemiskinan", pct: Math.max(0, Math.min(100, Math.round(100 - (socialData.poverty_rate || 0) * 3))), icon: "??", weight: "15%" },
+    { name: "Kualitas Udara", pct: Math.max(0, Math.min(100, Math.round(100 - (parseFloat(socialData.poverty_rate || 0) / 3)))), icon: "&#127787;", weight: "35%" },
+    { name: "Akses Air Bersih", pct: Math.round(socialData.clean_water_access || 0), icon: "&#128167;", weight: "25%" },
+    { name: "Sanitasi Dasar", pct: Math.round(socialData.basic_sanitation || 0), icon: "&#128703;", weight: "25%" },
+    { name: "Bebas Kemiskinan", pct: Math.max(0, Math.min(100, Math.round(100 - (socialData.poverty_rate || 0) * 3))), icon: "&#128176;", weight: "15%" },
   ];
 
   el.innerHTML = `
@@ -79,7 +79,7 @@ function renderCHI(chi, socialData) {
       </div>
     </div>
     <div style="font-size:0.75rem;color:var(--text3);padding:8px 12px;background:var(--surface2);border-radius:8px;border:1px solid var(--border)">
-      ?? Community Health Index menggabungkan kualitas udara, akses air bersih, sanitasi, dan tingkat kemiskinan. Sumber: WAQI + World Bank.
+      &#8505; Community Health Index menggabungkan kualitas udara, akses air bersih, sanitasi, dan tingkat kemiskinan. Sumber: WAQI + World Bank.
     </div>`;
 }
 
@@ -141,32 +141,32 @@ function renderSocialTimeline(impact) {
   el.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin-bottom:14px">
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:1.6rem;margin-bottom:4px">??</div>
+        <div style="font-size:1.6rem;margin-bottom:4px">&#128101;</div>
         <div style="font-size:1.3rem;font-weight:800;color:${riskColor}">${formatNum(impact.affected_people)}</div>
         <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">Warga Terdampak</div>
         <div style="font-size:0.65rem;color:var(--text3)">(${impact.affected_pct}% populasi)</div>
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:1.6rem;margin-bottom:4px">??</div>
+        <div style="font-size:1.6rem;margin-bottom:4px">&#128197;</div>
         <div style="font-size:1.3rem;font-weight:800;color:var(--amber)">${formatNum(impact.work_days_lost)}</div>
         <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">Hari Kerja Hilang</div>
         <div style="font-size:0.65rem;color:var(--text3)">Estimasi per tahun</div>
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:1.6rem;margin-bottom:4px">??</div>
+        <div style="font-size:1.6rem;margin-bottom:4px">&#127973;</div>
         <div style="font-size:1.3rem;font-weight:800;color:var(--red)">Rp ${impact.health_cost_billion_idr}M</div>
         <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">Estimasi Biaya Kesehatan</div>
         <div style="font-size:0.65rem;color:var(--text3)">Miliar rupiah/tahun</div>
       </div>
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:10px;padding:14px;text-align:center">
-        <div style="font-size:1.6rem;margin-bottom:4px">???</div>
+        <div style="font-size:1.6rem;margin-bottom:4px">&#127961;</div>
         <div style="font-size:1.3rem;font-weight:800;color:var(--blue)">${impact.population_million}jt</div>
         <div style="font-size:0.7rem;color:var(--text3);margin-top:2px">Populasi Kota</div>
         <div style="font-size:0.65rem;color:var(--text3)">AQI: ${impact.aqi} | PM2.5: ${impact.pm25}</div>
       </div>
     </div>
     <div style="background:var(--amber-l);border:1px solid #fcd34d;border-radius:8px;padding:10px 14px;font-size:0.75rem;color:var(--text2)">
-      ?? <strong>Catatan metodologi:</strong> ${impact.note}
+      &#9888; <strong>Catatan metodologi:</strong> ${impact.note}
     </div>`;
 }
 
@@ -270,11 +270,11 @@ function renderCommunityActions(actions, city) {
   if (!el || !actions) return;
 
   const actorConfig = {
-    "Warga & Keluarga":    { icon: "??", color: "var(--green-d)",  bg: "var(--green-l)",  border: "var(--green-m)" },
-    "RT/RW & Komunitas":   { icon: "???", color: "var(--teal)",     bg: "var(--teal-l)",   border: "#5eead4" },
-    "Sekolah & Kampus":    { icon: "??", color: "var(--blue)",     bg: "var(--blue-l)",   border: "#93c5fd" },
-    "Puskesmas & Klinik":  { icon: "??", color: "#7c3aed",         bg: "#f5f3ff",         border: "#c4b5fd" },
-    "Pemerintah Daerah":   { icon: "???", color: "var(--amber)",    bg: "var(--amber-l)",  border: "#fcd34d" },
+    "Warga & Keluarga":    { icon: "&#127968;", color: "var(--green-d)",  bg: "var(--green-l)",  border: "var(--green-m)" },
+    "RT/RW & Komunitas":   { icon: "&#127978;", color: "var(--teal)",     bg: "var(--teal-l)",   border: "#5eead4" },
+    "Sekolah & Kampus":    { icon: "&#127979;", color: "var(--blue)",     bg: "var(--blue-l)",   border: "#93c5fd" },
+    "Puskesmas & Klinik":  { icon: "&#127973;", color: "#7c3aed",         bg: "#f5f3ff",         border: "#c4b5fd" },
+    "Pemerintah Daerah":   { icon: "&#127963;", color: "var(--amber)",    bg: "var(--amber-l)",  border: "#fcd34d" },
   };
 
   el.innerHTML = `
