@@ -14,7 +14,7 @@ async function loadSocialFeatures() {
     if (!res.ok) throw new Error("HTTP " + res.status);
     const data = await res.json();
 
-    if (infoEl) infoEl.textContent = `Data sosial untuk ${data.city} � AQI: ${data.metrics.aqi} | Suhu: ${data.metrics.temperature}�C`;
+    if (infoEl) infoEl.textContent = `Data sosial untuk ${data.city} — AQI: ${data.metrics.aqi} | Suhu: ${data.metrics.temperature}C`;
 
     renderCHI(data.chi, data.social_data);
     renderVulnerabilityHeatmap(data.vulnerability_dimensions);
@@ -50,10 +50,10 @@ function renderCHI(chi, socialData) {
   }
 
   const components = [
-    { name: "Kualitas Udara", pct: Math.max(0, Math.min(100, Math.round(100 - (parseFloat(socialData.poverty_rate || 0) / 3)))), icon: "&#127787;", weight: "35%" },
-    { name: "Akses Air Bersih", pct: Math.round(socialData.clean_water_access || 0), icon: "&#128167;", weight: "25%" },
-    { name: "Sanitasi Dasar", pct: Math.round(socialData.basic_sanitation || 0), icon: "&#128703;", weight: "25%" },
-    { name: "Bebas Kemiskinan", pct: Math.max(0, Math.min(100, Math.round(100 - (socialData.poverty_rate || 0) * 3))), icon: "&#128176;", weight: "15%" },
+    { name: "Kualitas Udara", pct: Math.max(0, Math.min(100, Math.round(100 - (parseFloat(socialData.poverty_rate || 0) / 3)))), icon: "AQI", weight: "35%" },
+    { name: "Akses Air Bersih", pct: Math.round(socialData.clean_water_access || 0), icon: "H2O", weight: "25%" },
+    { name: "Sanitasi Dasar", pct: Math.round(socialData.basic_sanitation || 0), icon: "SAN", weight: "25%" },
+    { name: "Bebas Kemiskinan", pct: Math.max(0, Math.min(100, Math.round(100 - (socialData.poverty_rate || 0) * 3))), icon: "ECO", weight: "15%" },
   ];
 
   el.innerHTML = `
@@ -68,7 +68,7 @@ function renderCHI(chi, socialData) {
           const barColor = c.pct >= 70 ? "var(--green)" : c.pct >= 40 ? "var(--amber)" : "var(--red)";
           return `<div style="margin-bottom:8px">
             <div style="display:flex;justify-content:space-between;font-size:0.72rem;margin-bottom:3px">
-              <span style="color:var(--text2)">${c.icon} ${c.name}</span>
+              <span style="color:var(--text2)"><span style="font-size:0.65rem;font-weight:700;background:var(--border2);padding:1px 4px;border-radius:3px;margin-right:4px">${c.icon}</span>${c.name}</span>
               <span style="color:var(--text3)">${c.pct}% <span style="opacity:.6">(bobot ${c.weight})</span></span>
             </div>
             <div style="background:var(--border);border-radius:4px;height:7px;overflow:hidden">
