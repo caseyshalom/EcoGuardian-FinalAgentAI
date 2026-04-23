@@ -101,7 +101,7 @@ function renderVulnerabilityHeatmap(dimensions) {
       ${dimensions.map(d => {
         const cfg = levelConfig[d.level] || levelConfig.sedang;
         return `<div style="background:${cfg.bg};border:1.5px solid ${cfg.color}33;border-radius:10px;padding:12px;text-align:center">
-          <div style="font-size:1.4rem;margin-bottom:4px">${d.icon}</div>
+          <div style="font-size:0.65rem;font-weight:800;color:${cfg.color};background:${cfg.color}22;border:1px solid ${cfg.color}44;border-radius:6px;padding:4px 8px;display:inline-block;margin-bottom:6px;letter-spacing:.05em">${d.icon}</div>
           <div style="font-size:0.72rem;font-weight:700;color:#1a1a1a;margin-bottom:4px">${d.name}</div>
           <div style="font-size:1.2rem;font-weight:800;color:${cfg.color}">${d.value}${d.unit}</div>
           <div style="font-size:0.65rem;color:${cfg.color};font-weight:600;margin-top:4px;text-transform:uppercase">${cfg.label}</div>
@@ -254,7 +254,7 @@ function renderRadarChart(groups) {
         const scoreBg = g.score >= 70 ? "#fee2e2" : g.score >= 40 ? "#fef3c7" : "#dcfce7";
         const label = g.score >= 70 ? "Sangat Rentan" : g.score >= 40 ? "Rentan" : "Aman";
         return `<div style="background:${scoreBg};border:1px solid ${scoreColor}33;border-radius:8px;padding:10px;text-align:center">
-          <div style="font-size:1.2rem">${g.icon}</div>
+          <div style="font-size:0.6rem;font-weight:800;color:${scoreColor};background:${scoreColor}22;border:1px solid ${scoreColor}44;border-radius:5px;padding:3px 7px;display:inline-block;margin-bottom:4px;letter-spacing:.05em">${g.icon}</div>
           <div style="font-size:0.68rem;font-weight:700;color:#1a1a1a;margin:3px 0">${g.name}</div>
           <div style="font-size:1.1rem;font-weight:800;color:${scoreColor}">${g.score}<span style="font-size:0.65rem">/100</span></div>
           <div style="font-size:0.62rem;color:${scoreColor};font-weight:600">${label}</div>
