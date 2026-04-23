@@ -41,10 +41,10 @@
 
 /* Top bar */
 .lg-topbar{position:absolute;top:28px;left:32px;z-index:10;display:flex;align-items:center}
-.lg-logo{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.9);font-family:'Syne',sans-serif;font-size:13px;font-weight:700;letter-spacing:.15em}
+.lg-logo{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.9);font-family:'Outfit',sans-serif;font-size:13px;font-weight:600;letter-spacing:.1em}
 
 /* Center */
-.lg-center{position:relative;z-index:10;text-align:center;max-width:900px;padding:20px}
+.lg-center{position:relative;z-index:10;text-align:center;max-width:800px;padding:20px;margin:0 auto;left:50%;transform:translateX(-50%)}
 
 /* Hexagon */
 .lg-hex-wrap{position:absolute;top:50%;left:50%;transform:translate(-50%,-54%);width:340px;height:300px;pointer-events:none}
@@ -53,26 +53,26 @@
 
 /* Title */
 .lg-title{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(56px,9vw,110px);
-  font-weight:800;
+  font-family:'Outfit',sans-serif;
+  font-size:clamp(52px,8vw,96px);
+  font-weight:700;
   color:#fff;
-  letter-spacing:-3px;
-  line-height:1;
-  text-shadow:0 4px 40px rgba(0,0,0,.5);
+  letter-spacing:-2px;
+  line-height:1.05;
+  text-shadow:0 2px 24px rgba(0,0,0,.4);
   animation:lgUp .9s ease .2s both;
 }
-.lg-title span{color:#2ecc71;text-shadow:0 0 40px rgba(46,204,113,.6)}
+.lg-title span{color:#2ecc71;text-shadow:0 0 32px rgba(46,204,113,.5)}
 
 /* Subtitle */
 .lg-sub{
-  font-family:'DM Sans',sans-serif;
-  font-size:13px;
-  color:rgba(255,255,255,.65);
-  letter-spacing:.18em;
+  font-family:'Inter',sans-serif;
+  font-size:12px;
+  color:rgba(255,255,255,.6);
+  letter-spacing:.2em;
   font-weight:400;
-  margin:18px 0 36px;
-  line-height:1.8;
+  margin:16px 0 32px;
+  line-height:1.7;
   animation:lgUp .9s ease .4s both;
 }
 
@@ -82,7 +82,7 @@
   background:rgba(46,204,113,.15);
   border:1.5px solid rgba(46,204,113,.5);
   color:#fff;
-  font-family:'Syne',sans-serif;font-size:13px;font-weight:700;
+  font-family:'Outfit',sans-serif;font-size:12px;font-weight:600;
   letter-spacing:.15em;
   padding:14px 36px;
   border-radius:100px;
@@ -129,8 +129,8 @@
   --text: #1a2e1a;
   --text2: #4a6a4a;
   --text3: #7a967a;
-  --sans: "Instrument Sans", sans-serif;
-  --serif: "Instrument Serif", serif;
+  --sans: "Inter", sans-serif;
+  --serif: "Outfit", sans-serif;
   --mono: "DM Mono", monospace;
   --sidebar: 240px;
   --radius: 14px;
