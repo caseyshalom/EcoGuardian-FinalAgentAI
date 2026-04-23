@@ -109,14 +109,14 @@ function renderVulnerabilityHeatmap(dimensions) {
         </div>`;
       }).join("")}
     </div>
-    <div style="font-size:0.72rem;color:#555;display:flex;gap:12px;flex-wrap:wrap">
+    <div style="font-size:0.72rem;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap">
       ${Object.entries(levelConfig).map(([k, v]) =>
         `<span style="display:flex;align-items:center;gap:4px">
           <span style="width:10px;height:10px;border-radius:2px;background:${v.color};display:inline-block"></span>
-          <span style="color:#333">${v.label}</span>
+          <span style="color:var(--text2)">${v.label}</span>
         </span>`
       ).join("")}
-      <span style="margin-left:auto;opacity:.7;color:#555">Sumber: World Bank + WAQI</span>
+      <span style="margin-left:auto;opacity:.7;color:var(--text3)">Sumber: World Bank + WAQI</span>
     </div>`;
 }
 
