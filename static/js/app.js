@@ -58,6 +58,23 @@ function showPage(name, btn) {
   }
 }
 
+function enterDashboard() {
+  const landing = document.getElementById("eco-landing");
+  const dashboard = document.getElementById("eco-dashboard");
+  
+  if (landing) {
+    landing.classList.add("hide");
+    setTimeout(() => {
+      landing.style.display = "none";
+      if (dashboard) {
+        dashboard.style.display = "flex";
+      }
+    }, 1000); // Wait for CSS transition (1s)
+  } else if (dashboard) {
+    dashboard.style.display = "flex";
+  }
+}
+
 function setQuery(el, text) {
   document
     .querySelectorAll(".q-tag")
