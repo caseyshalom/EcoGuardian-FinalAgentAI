@@ -2927,9 +2927,11 @@ async function shareReport() {
 
 // ── Landing Page Animations & Interactivity ────────────────────────────
 
-document.addEventListener("DOMContentLoaded", () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initLandingInteractivity);
+} else {
   initLandingInteractivity();
-});
+}
 
 function initLandingInteractivity() {
   const landing = document.getElementById("eco-landing");
