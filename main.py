@@ -114,6 +114,7 @@ class QueryResponse(BaseModel):
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.head("/")
 async def root():
     html_path = BASE_DIR / "templates" / "index.html"
     return HTMLResponse(content=html_path.read_text(encoding="utf-8"))
