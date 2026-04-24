@@ -2924,3 +2924,133 @@ async function shareReport() {
     showNotif("Gagal membuat link share");
   }
 }
+
+// ── Landing Page Animations & Interactivity ────────────────────────────
+
+document.addEventListener("DOMContentLoaded", () => {
+  initLandingInteractivity();
+});
+
+function initLandingInteractivity() {
+  const landing = document.getElementById("eco-landing");
+  if (!landing) return;
+
+  // 1. Parallax Effect for the Center Content
+  const centerEl = landing.querySelector(".lg-center");
+  const topbarEl = landing.querySelector(".lg-topbar");
+  
+  landing.addEventListener("mousemove", (e) => {
+    if (landing.classList.contains("hide")) return;
+    
+    const x = (e.clientX / window.innerWidth - 0.5) * 2;
+    const y = (e.clientY / window.innerHeight - 0.5) * 2;
+    
+    if (centerEl) {
+      centerEl.style.transform = \`translateX(\${x * 20}px) translateY(\${y * 20}px) rotateX(\${-y * 5}deg) rotateY(\${x * 5}deg)\`;
+    }
+    if (topbarEl) {
+      topbarEl.style.transform = \`translateX(\${x * -10}px) translateY(\${y * -10}px)\`;
+    }
+  });
+
+  // Reset transform on leave
+  landing.addEventListener("mouseleave", () => {
+    if (centerEl) centerEl.style.transform = "translateX(0) translateY(0) rotateX(0) rotateY(0)";
+    if (topbarEl) topbarEl.style.transform = "translateX(0) translateY(0)";
+  });
+
+  // 2. Canvas Particles Effect
+  const canvas = document.getElementById("lgCanvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+  
+  let particles = [];
+  let w, h;
+  
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+  }
+  
+  window.addEventListener("resize", resize);
+  resize();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * w;
+      this.y = Math.random() * h;
+      this.size = Math.random() * 2.5 + 0.5;
+      this.speedX = Math.random() * 1 - 0.5;
+      this.speedY = Math.random() * -1 - 0.5; // Drift upwards like fireflies/spores
+      this.alpha = Math.random() * 0.5 + 0.1;
+      this.color = Math.random() > 0.5 ? "13, 148, 136" : "46, 204, 113"; // Teal or Green
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      
+      if (this.y < 0) {
+        this.y = h;
+        this.x = Math.random() * w;
+      }
+      if (this.x < 0) this.x = w;
+      if (this.x > w) this.x = 0;
+    }
+    draw() {
+      ctx.fillStyle = \`rgba(\${this.color}, \${this.alpha})\`;
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fill();
+      
+      // Glow
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = \`rgba(\${this.color}, 0.8)\`;
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    const count = window.innerWidth < 768 ? 40 : 100;
+    for (let i = 0; i < count; i++) {
+      particles.push(new Particle());
+    }
+  }
+
+  function animateParticles() {
+    if (landing.classList.contains("hide")) return; // Pause if hidden
+    ctx.clearRect(0, 0, w, h);
+    
+    for (let i = 0; i < particles.length; i++) {
+      particles[i].update();
+      particles[i].draw();
+    }
+    
+    // Connect particles
+    connectParticles();
+    
+    requestAnimationFrame(animateParticles);
+  }
+  
+  function connectParticles() {
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 100) {
+          ctx.beginPath();
+          ctx.strokeStyle = \`rgba(46, 204, 113, \${0.15 * (1 - distance / 100)})\`;
+          ctx.lineWidth = 0.5;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+          ctx.closePath();
+        }
+      }
+    }
+  }
+
+  initParticles();
+  animateParticles();
+}
