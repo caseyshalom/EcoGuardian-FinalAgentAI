@@ -45,13 +45,48 @@
               style="animation:hexPulse 4s ease-in-out infinite;animation-delay:.5s"/>
           </svg>
         </div>
+        <!-- Badge atas -->
+        <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(46,204,113,0.12);border:1px solid rgba(46,204,113,0.3);border-radius:100px;padding:5px 14px;font-size:11px;color:rgba(255,255,255,0.8);letter-spacing:.1em;margin-bottom:18px;animation:lgUp .9s ease .1s both">
+          <span style="width:6px;height:6px;border-radius:50%;background:#2ecc71;display:inline-block;animation:pulse 2s infinite"></span>
+          MULTI-AGENT AI SYSTEM
+        </div>
         <!-- Main title -->
         <div class="lg-title">Ever<span>Green</span></div>
         <p class="lg-sub">SISTEM MULTI-AGENT AI UNTUK PEMANTAUAN<br>LINGKUNGAN DAN DAMPAK SOSIAL SECARA REAL-TIME</p>
+
+        <!-- Typing effect -->
+        <div style="font-size:13px;color:rgba(46,204,113,0.8);font-family:'DM Mono',monospace;margin-bottom:28px;min-height:20px;animation:lgUp .9s ease .5s both" id="lgTyping"></div>
+
         <button class="lg-btn" onclick="enterDashboard()">
           JALANKAN AGENT AI
           <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M10 8l6 4-6 4V8z" fill="currentColor" stroke="none"/></svg>
         </button>
+
+        <!-- Stats row -->
+        <div style="display:flex;gap:28px;margin-top:36px;justify-content:center;animation:lgUp .9s ease .8s both;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-size:1.6rem;font-weight:700;color:#fff;font-family:'Outfit',sans-serif" id="lgStat1">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;margin-top:2px">AGEN AI</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+          <div style="text-align:center">
+            <div style="font-size:1.6rem;font-weight:700;color:#fff;font-family:'Outfit',sans-serif" id="lgStat2">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;margin-top:2px">SUMBER DATA</div>
+          </div>
+          <div style="width:1px;background:rgba(255,255,255,.15)"></div>
+          <div style="text-align:center">
+            <div style="font-size:1.6rem;font-weight:700;color:#2ecc71;font-family:'Outfit',sans-serif" id="lgStat3">0</div>
+            <div style="font-size:10px;color:rgba(255,255,255,.5);letter-spacing:.1em;margin-top:2px">KOTA DIDUKUNG</div>
+          </div>
+        </div>
+
+        <!-- Feature pills -->
+        <div style="display:flex;gap:8px;margin-top:24px;justify-content:center;flex-wrap:wrap;animation:lgUp .9s ease 1s both">
+          <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:4px 12px;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.08em">🌫️ Kualitas Udara</span>
+          <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:4px 12px;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.08em">🌧️ Prediksi Cuaca</span>
+          <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:4px 12px;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.08em">👥 Dampak Sosial</span>
+          <span style="background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:100px;padding:4px 12px;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.08em">🛡️ Audit Etika AI</span>
+        </div>
       </div>
       <!-- Scroll hint -->
       <div class="lg-scroll-hint">

@@ -2937,7 +2937,51 @@ function initLandingInteractivity() {
   const landing = document.getElementById("eco-landing");
   if (!landing) return;
 
-  // 1. Parallax Effect for the Center Content
+  // 1. Typing effect
+  const typingEl = document.getElementById("lgTyping");
+  const phrases = [
+    "> Memantau kualitas udara real-time...",
+    "> Memprediksi risiko banjir 7 hari...",
+    "> Menganalisis dampak sosial...",
+    "> Mengaudit etika AI output...",
+    "> Menyusun rencana aksi terukur...",
+  ];
+  let phraseIdx = 0, charIdx = 0, deleting = false;
+  function typeLoop() {
+    if (!typingEl) return;
+    const current = phrases[phraseIdx];
+    if (!deleting) {
+      typingEl.textContent = current.slice(0, ++charIdx);
+      if (charIdx === current.length) { deleting = true; setTimeout(typeLoop, 1800); return; }
+    } else {
+      typingEl.textContent = current.slice(0, --charIdx);
+      if (charIdx === 0) { deleting = false; phraseIdx = (phraseIdx + 1) % phrases.length; }
+    }
+    setTimeout(typeLoop, deleting ? 40 : 60);
+  }
+  setTimeout(typeLoop, 1200);
+
+  // 2. Counter animation
+  function animateCounter(el, target, suffix) {
+    suffix = suffix || "";
+    let start = 0;
+    const step = Math.ceil(target / 30);
+    const timer = setInterval(function() {
+      start = Math.min(start + step, target);
+      el.textContent = start + suffix;
+      if (start >= target) clearInterval(timer);
+    }, 40);
+  }
+  setTimeout(function() {
+    const s1 = document.getElementById("lgStat1");
+    const s2 = document.getElementById("lgStat2");
+    const s3 = document.getElementById("lgStat3");
+    if (s1) animateCounter(s1, 5);
+    if (s2) animateCounter(s2, 8);
+    if (s3) animateCounter(s3, 34, "+");
+  }, 800);
+
+  // 3. Parallax Effect
   const centerEl = landing.querySelector(".lg-center");
   const topbarEl = landing.querySelector(".lg-topbar");
   
@@ -2948,10 +2992,10 @@ function initLandingInteractivity() {
     const y = (e.clientY / window.innerHeight - 0.5) * 2;
     
     if (centerEl) {
-      centerEl.style.transform = `translateX(\${x * 20}px) translateY(\${y * 20}px) rotateX(\${-y * 5}deg) rotateY(\${x * 5}deg)`;
+      centerEl.style.transform = `translateX(${x * 20}px) translateY(${y * 20}px) rotateX(${-y * 5}deg) rotateY(${x * 5}deg)`;
     }
     if (topbarEl) {
-      topbarEl.style.transform = `translateX(\${x * -10}px) translateY(\${y * -10}px)`;
+      topbarEl.style.transform = `translateX(${x * -10}px) translateY(${y * -10}px)`;
     }
   });
 
@@ -2999,14 +3043,14 @@ function initLandingInteractivity() {
       if (this.x > w) this.x = 0;
     }
     draw() {
-      ctx.fillStyle = `rgba(\${this.color}, \${this.alpha})`;
+      ctx.fillStyle = `rgba(${this.color}, ${this.alpha})`;
       ctx.beginPath();
       ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
       ctx.fill();
       
       // Glow
       ctx.shadowBlur = 10;
-      ctx.shadowColor = `rgba(\${this.color}, 0.8)`;
+      ctx.shadowColor = `rgba(${this.color}, 0.8)`;
     }
   }
 
@@ -3042,7 +3086,7 @@ function initLandingInteractivity() {
         
         if (distance < 100) {
           ctx.beginPath();
-          ctx.strokeStyle = `rgba(46, 204, 113, \${0.15 * (1 - distance / 100)})`;
+          ctx.strokeStyle = `rgba(46, 204, 113, ${0.15 * (1 - distance / 100)})`;
           ctx.lineWidth = 0.5;
           ctx.moveTo(particles[i].x, particles[i].y);
           ctx.lineTo(particles[j].x, particles[j].y);
