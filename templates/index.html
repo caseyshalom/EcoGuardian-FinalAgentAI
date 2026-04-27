@@ -64,34 +64,39 @@
 
         <!-- Landing onboarding tooltip -->
         <div id="landingGuide" style="
-          display:none;
+          display:block;
           margin-top:20px;
           background:rgba(255,255,255,0.08);
           border:1px solid rgba(46,204,113,0.4);
           border-radius:14px;
           padding:16px 20px;
           max-width:420px;
-          animation:lgUp .5s ease both;
+          animation:lgUp .5s ease .7s both;
           backdrop-filter:blur(8px);
         ">
           <div style="display:flex;align-items:flex-start;gap:12px">
-            <div style="font-size:1.4rem;flex-shrink:0" id="lgGuideIcon">&#128640;</div>
+            <div style="font-size:1.4rem;flex-shrink:0" id="lgGuideIcon">&#128075;</div>
             <div style="flex:1">
-              <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:4px" id="lgGuideTitle"></div>
-              <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.6" id="lgGuideDesc"></div>
+              <div style="font-size:0.85rem;font-weight:700;color:#fff;margin-bottom:4px" id="lgGuideTitle">Halo! Selamat datang</div>
+              <div style="font-size:0.78rem;color:rgba(255,255,255,0.75);line-height:1.6" id="lgGuideDesc">EverGreen AI membantu kamu memantau kondisi lingkungan kotamu secara real-time dengan bantuan 5 agen AI.</div>
             </div>
           </div>
           <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px">
-            <div style="display:flex;gap:5px" id="lgGuideDots"></div>
+            <div style="display:flex;gap:5px" id="lgGuideDots">
+              <div style="width:16px;height:6px;border-radius:3px;background:#2ecc71"></div>
+              <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
+              <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
+              <div style="width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,0.3)"></div>
+            </div>
             <div style="display:flex;gap:8px">
               <button id="lgGuideBack" onclick="lgGuidePrev()" style="
                 padding:6px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);
                 background:transparent;color:rgba(255,255,255,0.7);font-size:0.75rem;
-                cursor:pointer;display:none">← Kembali</button>
+                cursor:pointer;display:none">&#8592; Kembali</button>
               <button id="lgGuideNext" onclick="lgGuideNext()" style="
                 padding:6px 16px;border-radius:8px;border:none;
                 background:rgba(46,204,113,0.8);color:#fff;font-size:0.75rem;
-                font-weight:700;cursor:pointer;transition:all .2s">Lanjut →</button>
+                font-weight:700;cursor:pointer">Lanjut &#8594;</button>
             </div>
           </div>
         </div>
@@ -1680,5 +1685,13 @@
 
   <script src="/static/js/app.js?v=2.0"></script>
   <script src="/static/js/social_features.js?v=2.0"></script>
+  <script>
+    window.addEventListener('load', function() {
+      if (typeof renderLgGuide === 'function') {
+        _lgGuideStep = 0;
+        renderLgGuide();
+      }
+    });
+  </script>
 </body>
 </html>

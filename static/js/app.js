@@ -3266,21 +3266,26 @@ function renderLgGuide() {
   const step = LG_GUIDE_STEPS[_lgGuideStep];
   const total = LG_GUIDE_STEPS.length;
 
-  document.getElementById('lgGuideIcon').innerHTML = step.icon;
-  document.getElementById('lgGuideTitle').textContent = step.title;
-  document.getElementById('lgGuideDesc').textContent = step.desc;
+  const iconEl = document.getElementById('lgGuideIcon');
+  const titleEl = document.getElementById('lgGuideTitle');
+  const descEl = document.getElementById('lgGuideDesc');
+  if (iconEl) iconEl.innerHTML = step.icon;
+  if (titleEl) titleEl.textContent = step.title;
+  if (descEl) descEl.textContent = step.desc;
 
   // Dots
   const dotsEl = document.getElementById('lgGuideDots');
-  dotsEl.innerHTML = LG_GUIDE_STEPS.map((_, i) =>
-    `<div style="width:6px;height:6px;border-radius:50%;background:${i === _lgGuideStep ? '#2ecc71' : 'rgba(255,255,255,0.3)'}"></div>`
-  ).join('');
+  if (dotsEl) {
+    dotsEl.innerHTML = LG_GUIDE_STEPS.map((_, i) =>
+      `<div style="width:${i===_lgGuideStep?'16px':'6px'};height:6px;border-radius:${i===_lgGuideStep?'3px':'50%'};background:${i===_lgGuideStep?'#2ecc71':'rgba(255,255,255,0.3)'};transition:all .3s"></div>`
+    ).join('');
+  }
 
   // Buttons
   const backBtn = document.getElementById('lgGuideBack');
   const nextBtn = document.getElementById('lgGuideNext');
   if (backBtn) backBtn.style.display = _lgGuideStep > 0 ? 'inline-block' : 'none';
-  if (nextBtn) nextBtn.textContent = _lgGuideStep === total - 1 ? 'Mengerti!' : 'Lanjut →';
+  if (nextBtn) nextBtn.innerHTML = _lgGuideStep === total - 1 ? '&#10003; Mengerti!' : 'Lanjut &#8594;';
 }
 
 function lgGuideNext() {
@@ -3310,9 +3315,8 @@ function landingBtnClick() {
   enterDashboard();
 }
 
-// Auto-start landing guide
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => setTimeout(startLandingGuide, 1500));
-} else {
-  setTimeout(startLandingGuide, 1500);
+// Auto-start landing guide — dipanggil dari inline script di HTML
+function initLandingGuide() {
+  _lgGuideStep = 0;
+  renderLgGuide();
 }
