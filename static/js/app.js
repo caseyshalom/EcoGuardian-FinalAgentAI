@@ -2039,6 +2039,9 @@ function toggleGuardian() {
   const panel = document.getElementById("guardianPanel");
   _guardianOpen = !_guardianOpen;
   panel.classList.toggle("open", _guardianOpen);
+  // Sembunyikan label saat panel dibuka
+  const label = document.getElementById("ecobotLabel");
+  if (label) label.style.display = _guardianOpen ? "none" : "block";
   if (_guardianOpen) {
     setTimeout(() => document.getElementById("guardianInput")?.focus(), 100);
   }
