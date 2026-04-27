@@ -3178,7 +3178,7 @@ function renderOnboardStep() {
 
   // Next button text
   const nextBtn = document.getElementById('onboardNext');
-  if (nextBtn) nextBtn.textContent = _onboardStep === total - 1 ? '&#127942; Mulai Sekarang!' : 'Selanjutnya →';
+  if (nextBtn) nextBtn.innerHTML = _onboardStep === total - 1 ? '&#127942; Mulai Sekarang!' : 'Selanjutnya &rarr;';
 
   // Highlight
   removeOnboardHighlight();
