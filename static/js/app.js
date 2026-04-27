@@ -3237,3 +3237,80 @@ function showTutorialAgain() {
   const overlay = document.getElementById('onboardingOverlay');
   if (overlay) { overlay.style.opacity = ''; overlay.style.display = 'flex'; }
 }
+
+
+// ══════════════════════════════════════════════════════
+// LANDING PAGE ONBOARDING
+// ══════════════════════════════════════════════════════
+
+const LG_GUIDE_STEPS = [
+  { icon: "&#128075;", title: "Halo! Selamat datang", desc: "EverGreen AI membantu kamu memantau kondisi lingkungan kotamu secara real-time dengan bantuan 5 agen AI." },
+  { icon: "&#127757;", title: "Apa yang bisa dilakukan?", desc: "Cek kualitas udara, prediksi cuaca 7 hari, analisis dampak sosial, dan dapatkan rekomendasi aksi konkret." },
+  { icon: "&#9889;", title: "Mudah digunakan", desc: "Pilih kota, pilih topik pertanyaan, klik tombol hijau — AI akan bekerja sendiri dan memberikan laporan lengkap." },
+  { icon: "&#128640;", title: "Siap memulai?", desc: "Klik tombol di atas untuk masuk ke dashboard. Jangan khawatir, ada panduan lagi di dalam!" },
+];
+
+let _lgGuideStep = 0;
+
+function startLandingGuide() {
+  if (localStorage.getItem('evergreen_landing_guided') === '1') return;
+  _lgGuideStep = 0;
+  renderLgGuide();
+  const guide = document.getElementById('landingGuide');
+  if (guide) guide.style.display = 'block';
+}
+
+function renderLgGuide() {
+  const step = LG_GUIDE_STEPS[_lgGuideStep];
+  const total = LG_GUIDE_STEPS.length;
+
+  document.getElementById('lgGuideIcon').innerHTML = step.icon;
+  document.getElementById('lgGuideTitle').textContent = step.title;
+  document.getElementById('lgGuideDesc').textContent = step.desc;
+
+  // Dots
+  const dotsEl = document.getElementById('lgGuideDots');
+  dotsEl.innerHTML = LG_GUIDE_STEPS.map((_, i) =>
+    `<div style="width:6px;height:6px;border-radius:50%;background:${i === _lgGuideStep ? '#2ecc71' : 'rgba(255,255,255,0.3)'}"></div>`
+  ).join('');
+
+  // Buttons
+  const backBtn = document.getElementById('lgGuideBack');
+  const nextBtn = document.getElementById('lgGuideNext');
+  if (backBtn) backBtn.style.display = _lgGuideStep > 0 ? 'inline-block' : 'none';
+  if (nextBtn) nextBtn.textContent = _lgGuideStep === total - 1 ? 'Mengerti!' : 'Lanjut →';
+}
+
+function lgGuideNext() {
+  if (_lgGuideStep < LG_GUIDE_STEPS.length - 1) {
+    _lgGuideStep++;
+    renderLgGuide();
+  } else {
+    lgGuideFinish();
+  }
+}
+
+function lgGuidePrev() {
+  if (_lgGuideStep > 0) {
+    _lgGuideStep--;
+    renderLgGuide();
+  }
+}
+
+function lgGuideFinish() {
+  const guide = document.getElementById('landingGuide');
+  if (guide) guide.style.display = 'none';
+  localStorage.setItem('evergreen_landing_guided', '1');
+}
+
+function landingBtnClick() {
+  lgGuideFinish();
+  enterDashboard();
+}
+
+// Auto-start landing guide
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => setTimeout(startLandingGuide, 1500));
+} else {
+  setTimeout(startLandingGuide, 1500);
+}
