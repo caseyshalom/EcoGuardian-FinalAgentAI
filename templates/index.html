@@ -1661,10 +1661,20 @@
   <script src="/static/js/social_features.js?v=3.0"></script>
   <script>
     window.addEventListener('load', function() {
+      // Init landing guide
       if (typeof renderLgGuide === 'function') {
         _lgGuideStep = 0;
         renderLgGuide();
       }
+      // Bind landing guide buttons
+      var btnNext = document.getElementById('lgGuideNext');
+      var btnBack = document.getElementById('lgGuideBack');
+      if (btnNext) btnNext.addEventListener('click', function() {
+        if (typeof lgGuideNextStep === 'function') lgGuideNextStep();
+      });
+      if (btnBack) btnBack.addEventListener('click', function() {
+        if (typeof lgGuidePrevStep === 'function') lgGuidePrevStep();
+      });
     });
   </script>
 </body>

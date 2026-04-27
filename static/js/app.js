@@ -3232,6 +3232,8 @@ function onboardSkip() {
   // Lewati → Ringkasan
   showPage('ringkasan', document.querySelector('[onclick*="ringkasan"]'));
 }
+
+function removeOnboardHighlight() {
   if (_onboardHighlighted) {
     _onboardHighlighted.classList.remove('onboard-highlight');
     _onboardHighlighted = null;
