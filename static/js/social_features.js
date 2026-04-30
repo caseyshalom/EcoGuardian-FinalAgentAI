@@ -212,16 +212,16 @@ function renderRadarChart(groups) {
   const dataPoints = groups.map((g, i) => getPoint(i, g.score));
   const dataPath = dataPoints.map((p, i) => `${i === 0 ? "M" : "L"}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(" ") + "Z";
 
-  // Labels
+  // Labels — gunakan teks biasa tanpa emoji di SVG (emoji tidak support di SVG semua browser)
   let labels = "";
   for (let i = 0; i < n; i++) {
-    const p = getAxisPoint(i, r + 22);
+    const p = getAxisPoint(i, r + 28);
     const g = groups[i];
     const scoreColor = g.score >= 70 ? "#ef4444" : g.score >= 40 ? "#f59e0b" : "#22c55e";
     labels += `<text x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}" text-anchor="middle" dominant-baseline="middle"
       font-size="11" fill="var(--text2)" font-family="DM Sans, sans-serif">
-      <tspan x="${p.x.toFixed(1)}" dy="-6">${g.icon} ${g.name.split(" ")[0]}</tspan>
-      <tspan x="${p.x.toFixed(1)}" dy="14" font-weight="700" fill="${scoreColor}">${g.score}</tspan>
+      <tspan x="${p.x.toFixed(1)}" dy="-6" font-size="12">${g.name}</tspan>
+      <tspan x="${p.x.toFixed(1)}" dy="15" font-weight="700" font-size="13" fill="${scoreColor}">${g.score}</tspan>
     </text>`;
   }
 
@@ -254,7 +254,7 @@ function renderRadarChart(groups) {
         const scoreBg = g.score >= 70 ? "#fee2e2" : g.score >= 40 ? "#fef3c7" : "#dcfce7";
         const label = g.score >= 70 ? "Sangat Rentan" : g.score >= 40 ? "Rentan" : "Aman";
         return `<div style="background:${scoreBg};border:1px solid ${scoreColor}33;border-radius:8px;padding:10px;text-align:center">
-          <div style="font-size:0.6rem;font-weight:800;color:${scoreColor};background:${scoreColor}22;border:1px solid ${scoreColor}44;border-radius:5px;padding:3px 7px;display:inline-block;margin-bottom:4px;letter-spacing:.05em">${g.icon}</div>
+          <div style="font-size:1.4rem;margin-bottom:4px">${g.icon}</div>
           <div style="font-size:0.68rem;font-weight:700;color:#1a1a1a;margin:3px 0">${g.name}</div>
           <div style="font-size:1.1rem;font-weight:800;color:${scoreColor}">${g.score}<span style="font-size:0.65rem">/100</span></div>
           <div style="font-size:0.62rem;color:${scoreColor};font-weight:600">${label}</div>

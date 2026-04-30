@@ -334,11 +334,11 @@ async def get_social_features(city: str, country_code: str = "ID"):
 
     # Radar groups
     radar_groups = [
-        {"name": "Anak-anak", "icon": "ANAK", "score": min(100, round(aqi_val/1.5 + poverty*2))},
-        {"name": "Lansia", "icon": "TUA", "score": min(100, round(aqi_val/1.2 + (100-water)*0.5))},
-        {"name": "Ibu Hamil", "icon": "IBU", "score": min(100, round(pm25_val*1.2 + poverty))},
-        {"name": "Masy. Miskin", "icon": "POOR", "score": min(100, round(poverty*3 + (100-sanitation)*0.3))},
-        {"name": "Disabilitas", "icon": "DIS", "score": min(100, round(aqi_val/2 + (100-electricity)*0.5))},
+        {"name": "Anak-anak", "icon": "&#128118;", "score": min(100, round(aqi_val/1.5 + poverty*2))},
+        {"name": "Lansia", "icon": "&#129491;", "score": min(100, round(aqi_val/1.2 + (100-water)*0.5))},
+        {"name": "Ibu", "icon": "&#129328;", "score": min(100, round(pm25_val*1.2 + poverty))},
+        {"name": "Masy.", "icon": "&#127968;", "score": min(100, round(poverty*3 + (100-sanitation)*0.3))},
+        {"name": "Disabilitas", "icon": "&#9855;&#65039;", "score": min(100, round(aqi_val/2 + (100-electricity)*0.5))},
     ]
 
     # Community actions
