@@ -287,9 +287,9 @@ function renderCommunityActions(actions, city) {
             <span style="font-size:0.78rem;font-weight:700;color:${cfg.color}">${actor}</span>
           </div>
           <ul style="margin:0;padding-left:16px;list-style:none">
-            ${actionList.map(a => `<li style="font-size:0.78rem;color:var(--text2);margin-bottom:6px;line-height:1.5;padding-left:0;display:flex;gap:6px;align-items:flex-start">
+            ${actionList.map(a => `<li style="font-size:0.78rem;color:#1a1a1a;margin-bottom:6px;line-height:1.5;padding-left:0;display:flex;gap:6px;align-items:flex-start">
               <span style="color:${cfg.color};flex-shrink:0;margin-top:2px">&#8594;</span>
-              <span>${a}</span>
+              <span style="color:#1a1a1a">${a}</span>
             </li>`).join("")}
           </ul>
         </div>`;
