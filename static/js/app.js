@@ -3264,7 +3264,9 @@ const LG_GUIDE_STEPS = [
 let _lgGuideStep = 0;
 
 function startLandingGuide() {
-  const isNewUser = localStorage.getItem('evergreen_landing_guided') !== '1';
+  // User lama = sudah pernah lihat landing guide ATAU sudah pernah masuk dashboard
+  const isNewUser = localStorage.getItem('evergreen_landing_guided') !== '1'
+                 && localStorage.getItem('evergreen_onboarded') !== '1';
   const guide = document.getElementById('landingGuide');
   const btn = document.getElementById('lgMainBtn');
 
