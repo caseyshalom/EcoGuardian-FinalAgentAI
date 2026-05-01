@@ -5,6 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>EverGreen AI — Masa Depan Berkelanjutan</title>
     <link rel="icon" type="image/x-icon" href="/static/favicon.ico" />
+    <!-- Sembunyikan guide untuk user lama SEBELUM render -->
+    <script>
+      (function() {
+        var guided = localStorage.getItem('evergreen_landing_guided');
+        var onboarded = localStorage.getItem('evergreen_onboarded');
+        if (guided === '1' || onboarded === '1') {
+          document.addEventListener('DOMContentLoaded', function() {
+            var g = document.getElementById('landingGuide');
+            if (g) g.style.display = 'none';
+          });
+          // Inject style langsung agar tidak flash
+          var s = document.createElement('style');
+          s.textContent = '#landingGuide{display:none!important}';
+          document.head.appendChild(s);
+        }
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link
       href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&family=DM+Mono:wght@300;400&display=swap"
