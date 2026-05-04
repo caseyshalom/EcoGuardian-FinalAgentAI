@@ -270,26 +270,26 @@ function renderCommunityActions(actions, city) {
   if (!el || !actions) return;
 
   const actorConfig = {
-    "Warga & Keluarga":    { icon: "&#127968;", color: "var(--green-d)",  bg: "var(--green-l)",  border: "var(--green-m)" },
-    "RT/RW & Komunitas":   { icon: "&#127978;", color: "var(--teal)",     bg: "var(--teal-l)",   border: "#5eead4" },
-    "Sekolah & Kampus":    { icon: "&#127979;", color: "var(--blue)",     bg: "var(--blue-l)",   border: "#93c5fd" },
-    "Puskesmas & Klinik":  { icon: "&#127973;", color: "#7c3aed",         bg: "#f5f3ff",         border: "#c4b5fd" },
-    "Pemerintah Daerah":   { icon: "&#127963;", color: "var(--amber)",    bg: "var(--amber-l)",  border: "#fcd34d" },
+    "Warga & Keluarga":    { icon: "&#127968;", color: "var(--green-d)",  bg: "var(--green-l)",  border: "var(--green-m)",  textColor: "var(--green-d)" },
+    "RT/RW & Komunitas":   { icon: "&#127978;", color: "var(--teal)",     bg: "var(--teal-l)",   border: "#5eead4",         textColor: "var(--teal)" },
+    "Sekolah & Kampus":    { icon: "&#127979;", color: "var(--blue)",     bg: "var(--blue-l)",   border: "#93c5fd",         textColor: "var(--blue)" },
+    "Puskesmas & Klinik":  { icon: "&#127973;", color: "#7c3aed",         bg: "#f5f3ff",         border: "#c4b5fd",         textColor: "#5b21b6" },
+    "Pemerintah Daerah":   { icon: "&#127963;", color: "var(--amber)",    bg: "var(--amber-l)",  border: "#fcd34d",         textColor: "var(--amber)" },
   };
 
   el.innerHTML = `
     <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px">
       ${Object.entries(actions).map(([actor, actionList]) => {
-        const cfg = actorConfig[actor] || { icon: "&#128100;", color: "var(--text2)", bg: "var(--surface2)", border: "var(--border2)" };
+        const cfg = actorConfig[actor] || { icon: "&#128100;", color: "var(--text2)", bg: "var(--surface2)", border: "var(--border2)", textColor: "var(--text2)" };
         return `<div style="background:${cfg.bg};border:1.5px solid ${cfg.border};border-radius:10px;padding:14px">
           <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
             <span style="font-size:1.2rem">${cfg.icon}</span>
             <span style="font-size:0.78rem;font-weight:700;color:${cfg.color}">${actor}</span>
           </div>
           <ul style="margin:0;padding-left:16px;list-style:none">
-            ${actionList.map(a => `<li style="font-size:0.78rem;color:#1a1a1a;margin-bottom:6px;line-height:1.5;padding-left:0;display:flex;gap:6px;align-items:flex-start">
+            ${actionList.map(a => `<li style="font-size:0.78rem;color:${cfg.textColor};margin-bottom:6px;line-height:1.5;padding-left:0;display:flex;gap:6px;align-items:flex-start;opacity:0.9">
               <span style="color:${cfg.color};flex-shrink:0;margin-top:2px">&#8594;</span>
-              <span style="color:#1a1a1a">${a}</span>
+              <span>${a}</span>
             </li>`).join("")}
           </ul>
         </div>`;
